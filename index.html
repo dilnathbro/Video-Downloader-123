@@ -66,6 +66,7 @@
   <!-- Main Content -->
   <main class="max-w-3xl mx-auto px-4 py-8 w-full relative z-10 space-y-8">
     
+    <!-- Input Box -->
     <div class="glass-card p-6 md:p-8 rounded-3xl relative">
       <div class="flex justify-between items-center mb-3">
         <label for="videoUrl" class="text-sm font-semibold text-slate-300 flex items-center gap-2">
@@ -105,7 +106,7 @@
     <!-- Loading Spinner -->
     <div id="loading" class="hidden text-center my-6">
       <div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin inline-block"></div>
-      <p class="text-slate-400 text-sm mt-3 animate-pulse">Server processing Facebook video...</p>
+      <p class="text-slate-400 text-sm mt-3 animate-pulse">Processing Facebook Video...</p>
     </div>
 
     <!-- Download Result Box -->
@@ -177,33 +178,55 @@
 
       loading.classList.remove('hidden');
 
-      try {
-        // Fetch through Vercel Serverless Function
-        const response = await fetch(`/api/download?url=${encodeURIComponent(urlInput)}`);
-        const data = await response.json();
+      let downloadLinks = [];
 
-        if (response.ok && data.success && data.downloadUrl) {
+      try {
+        // Multi-proxy Fallback Strategy
+        const apiResponse = await fetch(`https://api.v2.iscdl.com/fb?url=${encodeURIComponent(urlInput)}`);
+        
+        if (apiResponse.ok) {
+          const resData = await apiResponse.json();
+          if (resData.url) downloadLinks.push({ quality: 'Download HD Video', url: resData.url });
+          if (resData.sd) downloadLinks.push({ quality: 'Download SD Video', url: resData.sd });
+        }
+      } catch (err) {}
+
+      // Secondary Public Engine Fallback
+      if (downloadLinks.length === 0) {
+        try {
+          const altResponse = await fetch(`https://social-media-video-downloader.p.rapidapi.com/smvd/get/facebook?url=${encodeURIComponent(urlInput)}`, {
+            headers: {
+              'x-rapidapi-key': 'b471d409cdmsh211c752bb04e82dp17c9d2jsn5979857d4cc1',
+              'x-rapidapi-host': 'social-media-video-downloader.p.rapidapi.com'
+            }
+          });
+          const altData = await altResponse.json();
+          if (altData && altData.links) {
+            altData.links.forEach(l => downloadLinks.push({ quality: l.label || 'Download Video', url: l.url }));
+          }
+        } catch(e) {}
+      }
+
+      if (downloadLinks.length > 0) {
+        downloadLinks.forEach(item => {
           const btn = document.createElement('a');
-          btn.href = data.downloadUrl;
+          btn.href = item.url;
           btn.target = '_blank';
           btn.rel = 'noopener noreferrer';
           btn.className = 'bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
           btn.innerHTML = `
             <span class="flex items-center gap-2.5 text-sm truncate pr-2">
-              <i class="fa-brands fa-facebook text-blue-400"></i> ${data.quality || 'Download Video'}
+              <i class="fa-brands fa-facebook text-blue-400"></i> ${item.quality}
             </span>
             <span class="text-xs bg-blue-600/30 border border-blue-500/40 px-3 py-1.5 rounded-xl text-blue-300 font-bold whitespace-nowrap">
               Download <i class="fa-solid fa-download text-xs ml-1"></i>
             </span>
           `;
           qualityOptions.appendChild(btn);
-          resultCard.classList.remove('hidden');
-        } else {
-          errorMsg.textContent = data.message || "මෙම Facebook වීඩියෝව Extract කිරීමට නොහැකි විය. වීඩියෝව Public එකක්දැයි නැවත පරීක්‍ෂා කරන්න.";
-          errorMsg.classList.remove('hidden');
-        }
-      } catch (err) {
-        errorMsg.textContent = "Server Connection Error. කරුණාකර නැවත උත්සාහ කරන්න.";
+        });
+        resultCard.classList.remove('hidden');
+      } else {
+        errorMsg.textContent = "මෙම Facebook වීඩියෝව Extract කිරීමට නොහැකි විය. කරුණාකර වෙනත් Public Video Link එකක් ලබා දී උත්සාහ කරන්න.";
         errorMsg.classList.remove('hidden');
       }
 
