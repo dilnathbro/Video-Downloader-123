@@ -106,7 +106,7 @@
     <!-- Loading Spinner -->
     <div id="loading" class="hidden text-center my-6">
       <div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin inline-block"></div>
-      <p class="text-slate-400 text-sm mt-3 animate-pulse">Processing via Server...</p>
+      <p class="text-slate-400 text-sm mt-3 animate-pulse">Extracting Direct MP4 Video Link...</p>
     </div>
 
     <!-- Download Result Box -->
@@ -178,34 +178,52 @@
 
       loading.classList.remove('hidden');
 
-      try {
-        const res = await fetch(`/api/download?url=${encodeURIComponent(urlInput)}`);
-        const data = await res.json();
+      let directLinks = [];
 
-        if (res.ok && data.downloads) {
-          data.downloads.forEach(item => {
-            const btn = document.createElement('a');
-            btn.href = item.url;
-            btn.target = '_blank';
-            btn.download = 'facebook-video.mp4';
-            btn.className = 'bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
-            btn.innerHTML = `
-              <span class="flex items-center gap-2.5 text-sm truncate pr-2">
-                <i class="fa-brands fa-facebook text-blue-400"></i> ${item.quality}
-              </span>
-              <span class="text-xs bg-blue-600/30 border border-blue-500/40 px-3 py-1.5 rounded-xl text-blue-300 font-bold whitespace-nowrap">
-                Download <i class="fa-solid fa-download text-xs ml-1"></i>
-              </span>
-            `;
-            qualityOptions.appendChild(btn);
-          });
-          resultCard.classList.remove('hidden');
-        } else {
-          errorMsg.textContent = data.error || "මෙම වීඩියෝව Extract කිරීමට නොහැකි විය.";
-          errorMsg.classList.remove('hidden');
+      // Primary Direct Fast-Extraction Proxy
+      try {
+        const response = await fetch(`https://api.v2.iscdl.com/fb?url=${encodeURIComponent(urlInput)}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.url) directLinks.push({ label: 'Download HD Video (MP4)', url: data.url });
+          if (data.sd) directLinks.push({ label: 'Download SD Video (MP4)', url: data.sd });
         }
-      } catch (err) {
-        errorMsg.textContent = "Server සම්බන්ධතාවයේ දෝෂයක් ඇත. කරුණාකර නැවත උත්සාහ කරන්න.";
+      } catch (e) {}
+
+      // Secondary Backup Proxy
+      if (directLinks.length === 0) {
+        try {
+          const res = await fetch(`https://api.douyin.wtf/api?url=${encodeURIComponent(urlInput)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.video_data && data.video_data.nwm_url) {
+              directLinks.push({ label: 'Download Video (MP4)', url: data.video_data.nwm_url });
+            }
+          }
+        } catch (e) {}
+      }
+
+      if (directLinks.length > 0) {
+        directLinks.forEach(item => {
+          const btn = document.createElement('a');
+          btn.href = item.url;
+          btn.download = "facebook-video.mp4";
+          btn.target = '_blank';
+          btn.rel = 'noopener noreferrer';
+          btn.className = 'bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
+          btn.innerHTML = `
+            <span class="flex items-center gap-2.5 text-sm truncate pr-2">
+              <i class="fa-brands fa-facebook text-blue-400"></i> ${item.label}
+            </span>
+            <span class="text-xs bg-blue-600/30 border border-blue-500/40 px-3 py-1.5 rounded-xl text-blue-300 font-bold whitespace-nowrap">
+              Download Direct <i class="fa-solid fa-download text-xs ml-1"></i>
+            </span>
+          `;
+          qualityOptions.appendChild(btn);
+        });
+        resultCard.classList.remove('hidden');
+      } else {
+        errorMsg.textContent = "මෙම Facebook වීඩියෝව Extract කිරීමට නොහැකි විය. කරුණාකර Video එක Public එකක්දැයි පරීක්‍ෂා කර වෙනත් Link එකක් ලබා දී උත්සාහ කරන්න.";
         errorMsg.classList.remove('hidden');
       }
 
