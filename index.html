@@ -63,10 +63,9 @@
     <p class="text-slate-400 text-sm font-medium">Download Facebook Videos & Reels Easily</p>
   </header>
 
-  <!-- Main Content Container -->
+  <!-- Main Content -->
   <main class="max-w-3xl mx-auto px-4 py-8 w-full relative z-10 space-y-8">
     
-    <!-- Input Box Section -->
     <div class="glass-card p-6 md:p-8 rounded-3xl relative">
       <div class="flex justify-between items-center mb-3">
         <label for="videoUrl" class="text-sm font-semibold text-slate-300 flex items-center gap-2">
@@ -106,16 +105,15 @@
     <!-- Loading Spinner -->
     <div id="loading" class="hidden text-center my-6">
       <div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin inline-block"></div>
-      <p class="text-slate-400 text-sm mt-3 animate-pulse">Extracting Facebook Video...</p>
+      <p class="text-slate-400 text-sm mt-3 animate-pulse">Server processing Facebook video...</p>
     </div>
 
-    <!-- Dynamic Download Result Box -->
+    <!-- Download Result Box -->
     <div id="resultCard" class="hidden glass-card p-6 rounded-3xl text-center border border-blue-500/30 space-y-4">
       <h2 class="text-base font-bold text-slate-100 flex items-center justify-center gap-2">
         <i class="fa-solid fa-circle-check text-green-400"></i> Download Ready:
       </h2>
       
-      <!-- Quality Options Container -->
       <div id="qualityOptions" class="flex flex-col gap-3 max-w-md mx-auto pt-2"></div>
     </div>
 
@@ -142,7 +140,6 @@
 
   </main>
 
-  <!-- Footer -->
   <footer class="py-6 text-center text-xs text-slate-500 border-t border-slate-800/50 mt-10">
     Designed for <span class="text-blue-400 font-semibold">DiL Downloader</span> &copy; 2026
   </footer>
@@ -180,81 +177,33 @@
 
       loading.classList.remove('hidden');
 
-      let qualities = [];
-
-      // 1. Primary Engine: Public Cobalt Proxy (Multi-format & Shortlink friendly)
       try {
-        const proxyRes = await fetch(`https://api.cobalt.tools/api/json`, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ url: urlInput })
-        });
+        // Fetch through Vercel Serverless Function
+        const response = await fetch(`/api/download?url=${encodeURIComponent(urlInput)}`);
+        const data = await response.json();
 
-        if (proxyRes.ok) {
-          const proxyData = await proxyRes.json();
-          if (proxyData.url) {
-            qualities.push({ format: 'Download Video (HD Quality)', url: proxyData.url });
-          } else if (proxyData.picker && proxyData.picker.length > 0) {
-            proxyData.picker.forEach(item => {
-              if (item.url) qualities.push({ format: 'Download Video', url: item.url });
-            });
-          }
-        }
-      } catch (e) {}
-
-      // 2. Fallback Engine: RapidAPI
-      if (qualities.length === 0) {
-        const apiKey = "b471d409cdmsh211c752bb04e82dp17c9d2jsn5979857d4cc1";
-        const apiHost = "facebook-reel-and-video-downloader.p.rapidapi.com";
-
-        try {
-          const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(`https://${apiHost}/app/main.php?url=${encodeURIComponent(urlInput)}`)}`, {
-            method: 'GET',
-            headers: {
-              'x-rapidapi-key': apiKey,
-              'x-rapidapi-host': apiHost
-            }
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data && data.links) {
-              if (data.links['Download High Quality']) {
-                qualities.push({ format: 'Facebook HD Video', url: data.links['Download High Quality'] });
-              }
-              if (data.links['Download Low Quality']) {
-                qualities.push({ format: 'Facebook SD Video', url: data.links['Download Low Quality'] });
-              }
-            }
-          }
-        } catch (e) {}
-      }
-
-      // Display Results
-      if (qualities.length > 0) {
-        qualities.forEach(q => {
+        if (response.ok && data.success && data.downloadUrl) {
           const btn = document.createElement('a');
-          btn.href = q.url;
+          btn.href = data.downloadUrl;
           btn.target = '_blank';
           btn.rel = 'noopener noreferrer';
           btn.className = 'bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
           btn.innerHTML = `
             <span class="flex items-center gap-2.5 text-sm truncate pr-2">
-              <i class="fa-brands fa-facebook text-blue-400"></i> ${q.format}
+              <i class="fa-brands fa-facebook text-blue-400"></i> ${data.quality || 'Download Video'}
             </span>
             <span class="text-xs bg-blue-600/30 border border-blue-500/40 px-3 py-1.5 rounded-xl text-blue-300 font-bold whitespace-nowrap">
               Download <i class="fa-solid fa-download text-xs ml-1"></i>
             </span>
           `;
           qualityOptions.appendChild(btn);
-        });
-
-        resultCard.classList.remove('hidden');
-      } else {
-        errorMsg.textContent = "මෙම Facebook වීඩියෝව Extract කිරීමට නොහැකි විය. වීඩියෝව Public එකක්දැයි නැවත පරීක්‍ෂා කරන්න.";
+          resultCard.classList.remove('hidden');
+        } else {
+          errorMsg.textContent = data.message || "මෙම Facebook වීඩියෝව Extract කිරීමට නොහැකි විය. වීඩියෝව Public එකක්දැයි නැවත පරීක්‍ෂා කරන්න.";
+          errorMsg.classList.remove('hidden');
+        }
+      } catch (err) {
+        errorMsg.textContent = "Server Connection Error. කරුණාකර නැවත උත්සාහ කරන්න.";
         errorMsg.classList.remove('hidden');
       }
 
