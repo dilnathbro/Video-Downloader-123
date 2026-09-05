@@ -3,27 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DiL Downloader - Premium Video Downloader</title>
-  <!-- Tailwind CSS via CDN -->
+  <title>DiL Downloader - Universal Video Downloader</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
   <style>
-    /* Animated Gradient Background for Body */
     body {
       background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f2027, #1e293b);
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
     }
-
     @keyframes gradientBG {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
-    /* Animated Brand Name (DiL Downloader) */
     .brand-title {
       background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
       background-size: 300% 300%;
@@ -31,14 +24,11 @@
       -webkit-text-fill-color: transparent;
       animation: animatedGlow 4s linear infinite;
     }
-
     @keyframes animatedGlow {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
-    /* Glassmorphic Card Styling */
     .glass-card {
       background: rgba(30, 41, 59, 0.7);
       backdrop-filter: blur(16px);
@@ -46,47 +36,31 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     }
-
-    /* Input Focus Glow */
-    .glow-input:focus {
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
-    }
-
-    /* Animated Button Effect */
     .btn-gradient {
       background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
       transition: all 0.3s ease;
     }
     .btn-gradient:hover {
       background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-      box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
       transform: translateY(-2px);
     }
   </style>
 </head>
-<body class="text-white min-h-screen flex flex-col justify-between font-sans antialiased relative overflow-x-hidden">
-
-  <!-- Floating Background Decorative Circles -->
-  <div class="absolute -top-20 -left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-  <div class="absolute top-1/3 -right-20 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+<body class="text-white min-h-screen flex flex-col justify-between font-sans relative overflow-x-hidden">
 
   <!-- Header -->
   <header class="py-8 text-center border-b border-slate-800/60 relative z-10">
     <div class="flex items-center justify-center gap-3 mb-2">
-      <div class="p-3 bg-gradient-to-tr from-blue-600 to-pink-500 rounded-2xl shadow-lg shadow-purple-500/30">
+      <div class="p-3 bg-gradient-to-tr from-blue-600 to-pink-500 rounded-2xl shadow-lg">
         <i class="fa-solid fa-bolt text-2xl text-white"></i>
       </div>
-      <!-- Animated Brand Name -->
-      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight brand-title drop-shadow-md">
-        DiL Downloader
-      </h1>
+      <h1 class="text-4xl md:text-5xl font-extrabold brand-title">DiL Downloader</h1>
     </div>
-    <p class="text-slate-400 text-sm md:text-base font-medium">Fast, Free & High-Quality Social Media Video Downloader</p>
+    <p class="text-slate-400 text-sm font-medium">Fast & Free Video Downloader</p>
   </header>
 
-  <!-- Main Container -->
-  <main class="max-w-xl mx-auto px-4 py-12 w-full relative z-10">
-    <!-- Input Glass Card -->
+  <!-- Main Content -->
+  <main class="max-w-xl mx-auto px-4 py-10 w-full relative z-10">
     <div class="glass-card p-6 md:p-8 rounded-3xl">
       <label for="videoUrl" class="block text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
         <i class="fa-solid fa-link text-purple-400"></i> Paste Video Link Below:
@@ -96,62 +70,52 @@
         <input 
           type="url" 
           id="videoUrl" 
-          placeholder="Paste Facebook, TikTok, Insta or YT URL..." 
-          class="w-full px-5 py-4 bg-slate-900/80 border border-slate-700/80 rounded-2xl focus:outline-none focus:border-purple-500 glow-input text-white placeholder-slate-500 transition duration-300"
+          placeholder="Paste Facebook, TikTok, Insta or YT Link..." 
+          class="w-full px-5 py-4 bg-slate-900/80 border border-slate-700/80 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500"
         />
         <button 
           onclick="fetchVideo()" 
           id="downloadBtn" 
-          class="btn-gradient text-white font-bold px-8 py-4 rounded-2xl transition duration-300 flex items-center justify-center gap-2 cursor-pointer"
+          class="btn-gradient text-white font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-2"
         >
           <span>Fetch Video</span>
           <i class="fa-solid fa-arrow-down-long"></i>
         </button>
       </div>
 
-      <p id="errorMessage" class="text-red-400 text-xs mt-3 hidden text-center bg-red-950/40 py-2 rounded-lg border border-red-800/50"></p>
+      <p id="errorMessage" class="text-red-400 text-xs mt-4 hidden text-center bg-red-950/50 p-3 rounded-xl border border-red-800/50"></p>
     </div>
 
-    <!-- Loading State -->
+    <!-- Loading Spinner -->
     <div id="loading" class="hidden text-center my-10">
-      <div class="relative inline-flex">
-        <div class="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin"></div>
-      </div>
-      <p class="text-slate-400 text-sm mt-3 animate-pulse">Extracting high quality video stream...</p>
+      <div class="w-10 h-10 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin inline-block"></div>
+      <p class="text-slate-400 text-sm mt-2">Processing video link...</p>
     </div>
 
     <!-- Result Card -->
     <div id="resultCard" class="hidden mt-8 glass-card p-6 rounded-3xl text-center border border-purple-500/30">
-      <div class="relative overflow-hidden rounded-2xl mb-4 shadow-2xl border border-slate-700/50">
-        <img id="videoThumb" src="" alt="Video Thumbnail" class="w-full h-52 object-cover hidden" />
-      </div>
-
-      <h2 id="videoTitle" class="text-base md:text-lg font-bold mb-5 text-slate-100 line-clamp-2 px-2"></h2>
-      
-      <a id="downloadLink" href="#" target="_blank" download class="btn-gradient text-white font-bold py-4 px-8 rounded-2xl transition inline-flex items-center gap-2 shadow-lg w-full justify-center">
-        <i class="fa-solid fa-download"></i> Download Video Now
+      <h2 id="videoTitle" class="text-base font-bold mb-4 text-slate-100"></h2>
+      <a id="downloadLink" href="#" target="_blank" class="btn-gradient text-white font-bold py-4 px-8 rounded-2xl transition inline-flex items-center gap-2 w-full justify-center">
+        <i class="fa-solid fa-download"></i> Download Video
       </a>
     </div>
 
-    <!-- Supported Platforms Icons -->
+    <!-- Supported Platforms -->
     <div class="mt-12 text-center">
       <p class="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-4">Supported Platforms</p>
       <div class="flex justify-center gap-6 text-2xl text-slate-400">
-        <i class="fa-brands fa-facebook hover:text-blue-500 transition cursor-pointer"></i>
-        <i class="fa-brands fa-instagram hover:text-pink-500 transition cursor-pointer"></i>
-        <i class="fa-brands fa-tiktok hover:text-cyan-400 transition cursor-pointer"></i>
-        <i class="fa-brands fa-youtube hover:text-red-500 transition cursor-pointer"></i>
-        <i class="fa-brands fa-x-twitter hover:text-white transition cursor-pointer"></i>
+        <i class="fa-brands fa-facebook hover:text-blue-500 transition"></i>
+        <i class="fa-brands fa-instagram hover:text-pink-500 transition"></i>
+        <i class="fa-brands fa-tiktok hover:text-cyan-400 transition"></i>
+        <i class="fa-brands fa-youtube hover:text-red-500 transition"></i>
       </div>
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="py-6 text-center text-xs text-slate-500 border-t border-slate-800/50 relative z-10">
-    Designed with ❤️ for <span class="text-purple-400 font-semibold">DiL Downloader</span> &copy; 2026
+  <footer class="py-6 text-center text-xs text-slate-500 border-t border-slate-800/50">
+    Designed for <span class="text-purple-400 font-semibold">DiL Downloader</span> &copy; 2026
   </footer>
 
-  <!-- Vercel Serverless API Frontend Integration -->
   <script>
     async function fetchVideo() {
       const urlInput = document.getElementById('videoUrl').value.trim();
@@ -159,15 +123,13 @@
       const loading = document.getElementById('loading');
       const resultCard = document.getElementById('resultCard');
       const videoTitle = document.getElementById('videoTitle');
-      const videoThumb = document.getElementById('videoThumb');
       const downloadLink = document.getElementById('downloadLink');
 
-      // Reset States
       errorMsg.classList.add('hidden');
       resultCard.classList.add('hidden');
 
       if (!urlInput) {
-        errorMsg.textContent = "කරුණාකර Video Link එකක් Paste කරන්න.";
+        errorMsg.textContent = "කරුණාකර Video Link එකක් ලබා දෙන්න.";
         errorMsg.classList.remove('hidden');
         return;
       }
@@ -175,31 +137,28 @@
       loading.classList.remove('hidden');
 
       try {
-        // Vercel Serverless Route Connection
         const response = await fetch('/api/fetch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: urlInput })
         });
 
+        // JSON Response ද නැද්ද යන්න ආරක්ෂිතව Check කිරීම
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Server timeout හෝ API ගැටලුවක්. කරුණාකර තවත් මොහොතකින් උත්සාහ කරන්න.");
+        }
+
         const data = await response.json();
 
-        if (!response.ok) {
+        if (!response.ok || !data.video_url) {
           throw new Error(data.error || "Video එක සොයා ගැනීමට නොහැකි විය.");
         }
 
-        videoTitle.textContent = data.title || "Ready for Download";
-        
-        if (data.thumbnail) {
-          videoThumb.src = data.thumbnail;
-          videoThumb.classList.remove('hidden');
-        } else {
-          videoThumb.classList.add('hidden');
-        }
-
+        videoTitle.textContent = data.title || "Ready to Download";
         downloadLink.href = data.video_url;
-
         resultCard.classList.remove('hidden');
+
       } catch (err) {
         errorMsg.textContent = err.message;
         errorMsg.classList.remove('hidden');
@@ -210,4 +169,3 @@
   </script>
 </body>
 </html>
-
