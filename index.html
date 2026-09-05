@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DiL Downloader - Premium Universal Video Downloader</title>
+  <title>DiL Downloader - Premium Video Downloader</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -52,6 +52,7 @@
 </head>
 <body class="text-white min-h-screen flex flex-col justify-between font-sans relative overflow-x-hidden">
 
+  <!-- Header -->
   <header class="py-6 text-center border-b border-slate-800/60 relative z-10">
     <div class="flex items-center justify-center gap-3 mb-2">
       <div class="p-3 bg-gradient-to-tr from-blue-600 to-pink-500 rounded-2xl shadow-lg animate-pulse">
@@ -59,17 +60,19 @@
       </div>
       <h1 class="text-4xl md:text-5xl font-extrabold brand-title">DiL Downloader</h1>
     </div>
-    <p class="text-slate-400 text-sm font-medium">Ultra-Fast All-in-One Video Extractor</p>
+    <p class="text-slate-400 text-sm font-medium">Fast, Free & Direct Media Downloader</p>
   </header>
 
+  <!-- Main Content Container -->
   <main class="max-w-3xl mx-auto px-4 py-8 w-full relative z-10 space-y-8">
     
+    <!-- Input Box Section -->
     <div class="glass-card p-6 md:p-8 rounded-3xl relative">
       <div class="flex justify-between items-center mb-3">
         <label for="videoUrl" class="text-sm font-semibold text-slate-300 flex items-center gap-2">
-          <i class="fa-solid fa-link text-purple-400"></i> Paste Video URL:
+          <i class="fa-solid fa-link text-purple-400"></i> Paste Video Link Below:
         </label>
-        <button onclick="pasteFromClipboard()" class="text-xs bg-slate-800 hover:bg-slate-700 text-purple-300 px-3 py-1.5 rounded-xl border border-purple-500/30 transition flex items-center gap-1.5">
+        <button onclick="pasteFromClipboard()" class="text-xs bg-slate-800 hover:bg-slate-700 text-purple-300 px-3 py-1.5 rounded-xl border border-purple-500/30 transition flex items-center gap-1.5 cursor-pointer">
           <i class="fa-regular fa-clipboard"></i> Paste Link
         </button>
       </div>
@@ -100,19 +103,27 @@
       <p id="errorMessage" class="text-red-400 text-xs mt-4 hidden text-center bg-red-950/50 p-3 rounded-xl border border-red-800/50"></p>
     </div>
 
+    <!-- Loading Spinner -->
     <div id="loading" class="hidden text-center my-6">
       <div class="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin inline-block"></div>
-      <p class="text-slate-400 text-sm mt-3 animate-pulse">Extracting High-Quality Media Engine...</p>
+      <p class="text-slate-400 text-sm mt-3 animate-pulse">Extracting Media File...</p>
     </div>
 
+    <!-- Direct Result Box -->
     <div id="resultCard" class="hidden glass-card p-6 rounded-3xl text-center border border-purple-500/30 space-y-4">
-      <div id="mediaPreview" class="rounded-2xl overflow-hidden max-h-60 flex justify-center bg-black/40"></div>
-      <h2 id="videoTitle" class="text-base font-bold text-slate-100">Video Extracted Successfully!</h2>
+      <h2 class="text-base font-bold text-slate-100"><i class="fa-solid fa-circle-check text-green-400"></i> Video Ready for Download</h2>
       <a id="downloadLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-gradient text-white font-bold py-4 px-8 rounded-2xl transition inline-flex items-center gap-2 w-full justify-center shadow-lg hover:shadow-purple-500/20">
-        <i class="fa-solid fa-download"></i> Direct Download Video
+        <i class="fa-solid fa-download"></i> Download Video File
       </a>
     </div>
 
+    <!-- Embedded Downloader Container (External Redirect නැතිව Site එක ඇතුළෙම පෙන්වීමට) -->
+    <div id="embedCard" class="hidden glass-card p-4 rounded-3xl border border-purple-500/30 overflow-hidden">
+      <p class="text-xs text-slate-400 mb-3 text-center"><i class="fa-solid fa-shield-halved text-purple-400"></i> Direct Download Frame</p>
+      <iframe id="downloadFrame" class="w-full h-[450px] rounded-2xl border-0" src=""></iframe>
+    </div>
+
+    <!-- MND Mobile Store Banner -->
     <div class="glass-card store-card p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-4 text-center md:text-left">
         <div class="p-4 bg-pink-500/20 text-pink-400 rounded-2xl text-3xl">
@@ -120,7 +131,7 @@
         </div>
         <div>
           <h3 class="font-bold text-lg text-slate-100">Looking for Mobile Accessories & Gadgets?</h3>
-          <p class="text-xs text-slate-400">Explore premium mobile gear and fast chargers at MND Mobile Sri Lanka!</p>
+          <p class="text-xs text-slate-400">Visit MND Mobile Store for the best tech deals in Sri Lanka!</p>
         </div>
       </div>
       <a 
@@ -133,6 +144,7 @@
       </a>
     </div>
 
+    <!-- Supported Platforms -->
     <div class="glass-card p-6 rounded-3xl text-center">
       <p class="text-xs text-slate-400 uppercase tracking-widest font-semibold mb-4">Supported Social Media Platforms</p>
       <div class="flex justify-center gap-8 text-3xl text-slate-400">
@@ -143,37 +155,40 @@
       </div>
     </div>
 
+    <!-- Feature Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="glass-card p-5 rounded-2xl text-center">
         <div class="text-purple-400 text-2xl mb-2"><i class="fa-solid fa-bolt"></i></div>
-        <h4 class="font-bold text-sm mb-1">Instant Fetch</h4>
-        <p class="text-xs text-slate-400">Multi-engine API integration for high speed processing.</p>
+        <h4 class="font-bold text-sm mb-1">Ultra Fast</h4>
+        <p class="text-xs text-slate-400">High-speed server fetching for quick downloads.</p>
       </div>
       <div class="glass-card p-5 rounded-2xl text-center">
         <div class="text-blue-400 text-2xl mb-2"><i class="fa-solid fa-shield-halved"></i></div>
-        <h4 class="font-bold text-sm mb-1">100% Free & Safe</h4>
-        <p class="text-xs text-slate-400">No pop-up ads, malware or account login required.</p>
+        <h4 class="font-bold text-sm mb-1">100% Safe</h4>
+        <p class="text-xs text-slate-400">No pop-up ads, viruses or login requirements.</p>
       </div>
       <div class="glass-card p-5 rounded-2xl text-center">
         <div class="text-pink-400 text-2xl mb-2"><i class="fa-solid fa-gem"></i></div>
-        <h4 class="font-bold text-sm mb-1">Original Quality</h4>
-        <p class="text-xs text-slate-400">Downloads original HD, 1080p and 4K media resolution.</p>
+        <h4 class="font-bold text-sm mb-1">HD Quality</h4>
+        <p class="text-xs text-slate-400">Download videos in original HD quality.</p>
       </div>
     </div>
 
+    <!-- How to Download Guide -->
     <div class="glass-card p-6 rounded-3xl">
       <h3 class="font-bold text-slate-200 text-base mb-4 flex items-center gap-2">
         <i class="fa-solid fa-circle-info text-blue-400"></i> How to Download Videos?
       </h3>
       <ol class="text-xs text-slate-300 space-y-3 list-decimal list-inside">
-        <li>Copy the video share link from Facebook, Instagram, TikTok, or YouTube.</li>
-        <li>Tap the <strong>"Paste Link"</strong> button above to insert the URL directly.</li>
-        <li>Click <strong>"Fetch Video"</strong> to retrieve your downloadable video file.</li>
+        <li>Copy the link of the video from Facebook, TikTok, Instagram or YouTube.</li>
+        <li>Paste the URL link into the input box above.</li>
+        <li>Click <strong>"Fetch Video"</strong> and then download your video file.</li>
       </ol>
     </div>
 
   </main>
 
+  <!-- Footer -->
   <footer class="py-6 text-center text-xs text-slate-500 border-t border-slate-800/50 mt-10">
     Designed for <span class="text-purple-400 font-semibold">DiL Downloader</span> &copy; 2026
   </footer>
@@ -197,12 +212,13 @@
       const errorMsg = document.getElementById('errorMessage');
       const loading = document.getElementById('loading');
       const resultCard = document.getElementById('resultCard');
+      const embedCard = document.getElementById('embedCard');
+      const downloadFrame = document.getElementById('downloadFrame');
       const downloadLink = document.getElementById('downloadLink');
-      const mediaPreview = document.getElementById('mediaPreview');
 
       errorMsg.classList.add('hidden');
       resultCard.classList.add('hidden');
-      mediaPreview.innerHTML = '';
+      embedCard.classList.add('hidden');
 
       if (!urlInput) {
         errorMsg.textContent = "කරුණාකර Video Link එකක් ලබා දෙන්න.";
@@ -215,7 +231,7 @@
       try {
         let downloadUrl = null;
 
-        // Provider 1: Rapid Multi-platform Fetch Engine
+        // Engine 1: Direct Universal Fetcher
         try {
           const res1 = await fetch(`https://api.vkrdown.workers.dev/server?vkr=${encodeURIComponent(urlInput)}`);
           if (res1.ok) {
@@ -224,7 +240,7 @@
           }
         } catch (e) {}
 
-        // Provider 2: Cobalt Direct Extraction Fallback
+        // Engine 2: Cobalt Direct Extraction
         if (!downloadUrl) {
           try {
             const res2 = await fetch('https://api.cobalt.tools/api/json', {
@@ -243,12 +259,13 @@
           downloadLink.href = downloadUrl;
           resultCard.classList.remove('hidden');
         } else {
-          // Direct SaveFrom Redirect Fallback Solution for Restricted FB/Insta Share Links
-          window.open(`https://en.savefrom.net/1-youtube-video-downloader-3v1/?url=${encodeURIComponent(urlInput)}`, '_blank');
+          // Direct URL Extraction නොහැකි වූ විට, වෙනත් tab වලට යවන්නේ නැතිව Site එක ඇතුළෙම Frame එකෙන් Download පහසුකම පෙන්වයි
+          downloadFrame.src = `https://en.savefrom.net/1-youtube-video-downloader-3v1/?url=${encodeURIComponent(urlInput)}`;
+          embedCard.classList.remove('hidden');
         }
 
       } catch (err) {
-        errorMsg.textContent = "වීඩියෝ Link එක Fetch කිරීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.";
+        errorMsg.textContent = "වීඩියෝ එක Fetch කිරීමට නොහැකි විය. වෙනත් Public Video Link එකක් යොදා බලන්න.";
         errorMsg.classList.remove('hidden');
       } finally {
         loading.classList.add('hidden');
