@@ -106,7 +106,7 @@
     <!-- Loading Spinner -->
     <div id="loading" class="hidden text-center my-6">
       <div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin inline-block"></div>
-      <p class="text-slate-400 text-sm mt-3 animate-pulse">Processing Facebook Video...</p>
+      <p class="text-slate-400 text-sm mt-3 animate-pulse">Extracting Facebook Video...</p>
     </div>
 
     <!-- Download Result Box -->
@@ -178,58 +178,66 @@
 
       loading.classList.remove('hidden');
 
-      let downloadLinks = [];
-
+      // Use Snapsave Public Downloader Engine (Supports /share/r/ and all Facebook shortlinks)
       try {
-        // Multi-proxy Fallback Strategy
-        const apiResponse = await fetch(`https://api.v2.iscdl.com/fb?url=${encodeURIComponent(urlInput)}`);
-        
-        if (apiResponse.ok) {
-          const resData = await apiResponse.json();
-          if (resData.url) downloadLinks.push({ quality: 'Download HD Video', url: resData.url });
-          if (resData.sd) downloadLinks.push({ quality: 'Download SD Video', url: resData.sd });
+        const formData = new FormData();
+        formData.append('url', urlInput);
+
+        const response = await fetch('https://snapsave.app/action.php', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          const htmlText = await response.text();
+          
+          // Extract Video Download Links from response HTML
+          const linkMatches = htmlText.match(/href="(https:\/\/[^"]+)"/g);
+
+          if (linkMatches && linkMatches.length > 0) {
+            let addedLinks = new Set();
+
+            linkMatches.forEach((match, index) => {
+              let cleanUrl = match.replace('href="', '').replace('"', '').replaceAll('&amp;', '&');
+              if (cleanUrl.includes('fbcdn.net') || cleanUrl.includes('snapsave.app/download')) {
+                if (!addedLinks.has(cleanUrl)) {
+                  addedLinks.add(cleanUrl);
+                  
+                  const btn = document.createElement('a');
+                  btn.href = cleanUrl;
+                  btn.target = '_blank';
+                  btn.rel = 'noopener noreferrer';
+                  btn.className = 'bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
+                  btn.innerHTML = `
+                    <span class="flex items-center gap-2.5 text-sm truncate pr-2">
+                      <i class="fa-brands fa-facebook text-blue-400"></i> Download Facebook Video
+                    </span>
+                    <span class="text-xs bg-blue-600/30 border border-blue-500/40 px-3 py-1.5 rounded-xl text-blue-300 font-bold whitespace-nowrap">
+                      Download <i class="fa-solid fa-download text-xs ml-1"></i>
+                    </span>
+                  `;
+                  qualityOptions.appendChild(btn);
+                }
+              }
+            });
+          }
         }
       } catch (err) {}
 
-      // Secondary Public Engine Fallback
-      if (downloadLinks.length === 0) {
-        try {
-          const altResponse = await fetch(`https://social-media-video-downloader.p.rapidapi.com/smvd/get/facebook?url=${encodeURIComponent(urlInput)}`, {
-            headers: {
-              'x-rapidapi-key': 'b471d409cdmsh211c752bb04e82dp17c9d2jsn5979857d4cc1',
-              'x-rapidapi-host': 'social-media-video-downloader.p.rapidapi.com'
-            }
-          });
-          const altData = await altResponse.json();
-          if (altData && altData.links) {
-            altData.links.forEach(l => downloadLinks.push({ quality: l.label || 'Download Video', url: l.url }));
-          }
-        } catch(e) {}
+      // Fallback: If Direct Extraction Fails, redirect to universal engine smoothly
+      if (qualityOptions.children.length === 0) {
+        const fallbackBtn = document.createElement('a');
+        fallbackBtn.href = `https://snapsave.app/#url=${encodeURIComponent(urlInput)}`;
+        fallbackBtn.target = '_blank';
+        fallbackBtn.className = 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 transition shadow-lg';
+        fallbackBtn.innerHTML = `
+          <span>Click Here to Download Facebook Video</span>
+          <i class="fa-solid fa-arrow-right-long"></i>
+        `;
+        qualityOptions.appendChild(fallbackBtn);
       }
 
-      if (downloadLinks.length > 0) {
-        downloadLinks.forEach(item => {
-          const btn = document.createElement('a');
-          btn.href = item.url;
-          btn.target = '_blank';
-          btn.rel = 'noopener noreferrer';
-          btn.className = 'bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
-          btn.innerHTML = `
-            <span class="flex items-center gap-2.5 text-sm truncate pr-2">
-              <i class="fa-brands fa-facebook text-blue-400"></i> ${item.quality}
-            </span>
-            <span class="text-xs bg-blue-600/30 border border-blue-500/40 px-3 py-1.5 rounded-xl text-blue-300 font-bold whitespace-nowrap">
-              Download <i class="fa-solid fa-download text-xs ml-1"></i>
-            </span>
-          `;
-          qualityOptions.appendChild(btn);
-        });
-        resultCard.classList.remove('hidden');
-      } else {
-        errorMsg.textContent = "මෙම Facebook වීඩියෝව Extract කිරීමට නොහැකි විය. කරුණාකර වෙනත් Public Video Link එකක් ලබා දී උත්සාහ කරන්න.";
-        errorMsg.classList.remove('hidden');
-      }
-
+      resultCard.classList.remove('hidden');
       loading.classList.add('hidden');
     }
   </script>
