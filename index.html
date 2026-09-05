@@ -1,9 +1,9 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DiL Downloader - Multi-Quality Video Downloader</title>
+  <title>DiL Downloader - All-in-One Video Downloader</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -60,7 +60,7 @@
       </div>
       <h1 class="text-4xl md:text-5xl font-extrabold brand-title">DiL Downloader</h1>
     </div>
-    <p class="text-slate-400 text-sm font-medium">Select Quality & No-Watermark Downloader</p>
+    <p class="text-slate-400 text-sm font-medium">Download Videos from Facebook, TikTok, Instagram & YouTube</p>
   </header>
 
   <!-- Main Content Container -->
@@ -95,8 +95,8 @@
           id="downloadBtn" 
           class="btn-gradient text-white font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95"
         >
-          <span>Fetch Video & Qualities</span>
-          <i class="fa-solid fa-sliders"></i>
+          <span>Fetch Download Link</span>
+          <i class="fa-solid fa-download"></i>
         </button>
       </div>
 
@@ -106,7 +106,7 @@
     <!-- Loading Spinner -->
     <div id="loading" class="hidden text-center my-6">
       <div class="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin inline-block"></div>
-      <p class="text-slate-400 text-sm mt-3 animate-pulse">Extracting Direct Links & Watermark Removal...</p>
+      <p class="text-slate-400 text-sm mt-3 animate-pulse">Extracting Direct Links...</p>
     </div>
 
     <!-- Dynamic Quality Selection Result Box -->
@@ -115,10 +115,8 @@
         <i class="fa-solid fa-circle-check text-green-400"></i> Select Download Option:
       </h2>
       
-      <!-- Quality Options List Container -->
-      <div id="qualityOptions" class="flex flex-col gap-3 max-w-md mx-auto pt-2">
-        <!-- Quality Buttons Will Render Here Dynamically -->
-      </div>
+      <!-- Quality Options Container -->
+      <div id="qualityOptions" class="flex flex-col gap-3 max-w-md mx-auto pt-2"></div>
     </div>
 
     <!-- MND Mobile Store Banner -->
@@ -161,9 +159,9 @@
         <p class="text-xs text-slate-400">Clean TikTok video downloads without logo.</p>
       </div>
       <div class="glass-card p-5 rounded-2xl text-center">
-        <div class="text-purple-400 text-2xl mb-2"><i class="fa-solid fa-sliders"></i></div>
-        <h4 class="font-bold text-sm mb-1">Quality Options</h4>
-        <p class="text-xs text-slate-400">Supports HD, SD, and MP3 audio downloads.</p>
+        <div class="text-purple-400 text-2xl mb-2"><i class="fa-solid fa-bolt"></i></div>
+        <h4 class="font-bold text-sm mb-1">Fast Download</h4>
+        <p class="text-xs text-slate-400">Direct high-speed stream links.</p>
       </div>
       <div class="glass-card p-5 rounded-2xl text-center">
         <div class="text-pink-400 text-2xl mb-2"><i class="fa-solid fa-shield-halved"></i></div>
@@ -205,59 +203,56 @@
       qualityOptions.innerHTML = '';
 
       if (!urlInput) {
-        errorMsg.textContent = "කරුණාකර Video Link එකක් ලබා දෙන්න.";
+        errorMsg.textContent = "කරුණාකර Video Link එකක් ඇතුළත් කරන්න.";
         errorMsg.classList.remove('hidden');
         return;
       }
 
       loading.classList.remove('hidden');
 
-      try {
-        let qualities = [];
+      let qualities = [];
 
-        // Dedicated TikTok No-Watermark API Check
-        if (urlInput.includes('tiktok.com')) {
-          try {
-            const tikRes = await fetch(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(urlInput)}`);
-            if (tikRes.ok) {
-              const tikData = await tikRes.json();
-              if (tikData.video?.noWatermark) {
-                qualities.push({ format: 'TikTok Video (No Watermark)', url: tikData.video.noWatermark });
-              }
-              if (tikData.video?.watermark) {
-                qualities.push({ format: 'TikTok Video (With Watermark)', url: tikData.video.watermark });
-              }
-              if (tikData.music?.play_url) {
-                qualities.push({ format: 'Audio Only (MP3)', url: tikData.music.play_url });
-              }
+      // Engine 1: TikTok No-Watermark Dedicated Engine
+      if (urlInput.includes('tiktok.com')) {
+        try {
+          const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(urlInput)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.data) {
+              if (data.data.play) qualities.push({ format: 'TikTok (No Watermark)', url: data.data.play });
+              if (data.data.wmplay) qualities.push({ format: 'TikTok (With Watermark)', url: data.data.wmplay });
+              if (data.data.music) qualities.push({ format: 'Audio Only (MP3)', url: data.data.music });
             }
-          } catch(e) {}
-        }
+          }
+        } catch(e) {}
+      }
 
-        // Multi-platform Fallback Engine (Facebook, Insta, YouTube & TikTok)
-        if (qualities.length === 0) {
-          try {
-            const res = await fetch(`https://api.vkrdown.workers.dev/server?vkr=${encodeURIComponent(urlInput)}`);
-            if (res.ok) {
-              const data = await res.json();
-              if (data.downloads && data.downloads.length > 0) {
-                qualities = data.downloads.map(d => ({ format: d.format || d.quality || 'Download Video', url: d.url }));
-              } else if (data.data) {
-                qualities.push({ format: 'HD Quality (No Watermark)', url: data.data });
-              }
+      // Engine 2: Multi-Platform Engine (Facebook, Instagram, YouTube)
+      if (qualities.length === 0) {
+        try {
+          const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(`https://api.vkrdown.workers.dev/server?vkr=${encodeURIComponent(urlInput)}`)}`;
+          const res = await fetch(proxyUrl);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.downloads && data.downloads.length > 0) {
+              qualities = data.downloads.map(d => ({ format: d.format || d.quality || 'HD Download', url: d.url }));
+            } else if (data.data) {
+              qualities.push({ format: 'HD Quality Video', url: data.data });
             }
-          } catch(e) {}
-        }
+          }
+        } catch(e) {}
+      }
 
-        // Secondary Backup Engine
-        if (qualities.length === 0) {
-          const cobRes = await fetch('https://api.cobalt.tools/api/json', {
+      // Engine 3: Backup Cobalt / Social Multi Engine
+      if (qualities.length === 0) {
+        try {
+          const res = await fetch('https://api.cobalt.tools/api/json', {
             method: 'POST',
             headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify({ url: urlInput })
           });
-          if (cobRes.ok) {
-            const cobData = await cobRes.json();
+          if (res.ok) {
+            const cobData = await res.json();
             if (cobData.picker) {
               qualities = cobData.picker.map((item, idx) => ({
                 format: item.quality || `Option ${idx + 1}`,
@@ -267,40 +262,38 @@
               qualities.push({ format: 'Direct Download Link', url: cobData.url });
             }
           }
-        }
-
-        if (qualities.length > 0) {
-          qualities.forEach(q => {
-            const label = q.format || 'Download Video';
-            const link = q.url;
-            
-            const btn = document.createElement('a');
-            btn.href = link;
-            btn.target = '_blank';
-            btn.rel = 'noopener noreferrer';
-            btn.className = 'bg-slate-800 hover:bg-slate-700 border border-purple-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
-            btn.innerHTML = `
-              <span class="flex items-center gap-2.5 text-sm">
-                <i class="fa-solid fa-circle-play text-purple-400"></i> ${label}
-              </span>
-              <span class="text-xs bg-purple-600/30 border border-purple-500/40 px-3 py-1.5 rounded-xl text-purple-300 font-bold">
-                Download <i class="fa-solid fa-download text-xs ml-1"></i>
-              </span>
-            `;
-            qualityOptions.appendChild(btn);
-          });
-
-          resultCard.classList.remove('hidden');
-        } else {
-          throw new Error("මෙම Link එකෙන් Video එක ලබා ගැනීමට නොහැකි විය. කරුණාකර Valid Public Link එකක් ඇතුළත් කරන්න.");
-        }
-
-      } catch (err) {
-        errorMsg.textContent = err.message || "වීඩියෝ එක Fetch කිරීමට නොහැකි විය.";
-        errorMsg.classList.remove('hidden');
-      } finally {
-        loading.classList.add('hidden');
+        } catch(e) {}
       }
+
+      if (qualities.length > 0) {
+        qualities.forEach(q => {
+          const label = q.format || 'Download Video';
+          const link = q.url;
+          
+          const btn = document.createElement('a');
+          btn.href = link;
+          btn.target = '_blank';
+          btn.rel = 'noopener noreferrer';
+          btn.className = 'bg-slate-800 hover:bg-slate-700 border border-purple-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
+          btn.innerHTML = `
+            <span class="flex items-center gap-2.5 text-sm">
+              <i class="fa-solid fa-circle-play text-purple-400"></i> ${label}
+            </span>
+            <span class="text-xs bg-purple-600/30 border border-purple-500/40 px-3 py-1.5 rounded-xl text-purple-300 font-bold">
+              Download <i class="fa-solid fa-download text-xs ml-1"></i>
+            </span>
+          `;
+          qualityOptions.appendChild(btn);
+        });
+
+        resultCard.classList.remove('hidden');
+      } else {
+        errorMsg.textContent = "මෙම Link එකෙන් Video එක ලබා ගැනීමට නොහැකි විය. Public Video Link එකක් භාවිතා කරන්න.";
+        errorMsg.classList.remove('hidden');
+      }
+
+      loading.classList.hidden = true;
+      loading.classList.add('hidden');
     }
   </script>
 </body>
