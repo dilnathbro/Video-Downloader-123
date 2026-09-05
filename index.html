@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -193,13 +193,13 @@
 
       let qualities = [];
 
-      // 1. TikTok Engine (TikWM)
+      // 1. TikTok Handler (TikWM Engine)
       if (urlInput.includes('tiktok.com')) {
         try {
           const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(urlInput)}`);
           if (res.ok) {
             const data = await res.json();
-            if (data.data) {
+            if (data && data.data) {
               if (data.data.play) qualities.push({ format: 'TikTok Video (No Watermark)', url: data.data.play });
               if (data.data.wmplay) qualities.push({ format: 'TikTok Video (With Watermark)', url: data.data.wmplay });
               if (data.data.music) qualities.push({ format: 'Audio (MP3)', url: data.data.music });
@@ -208,57 +208,71 @@
         } catch(e) {}
       }
 
-      // 2. Facebook / Instagram Dedicated Engine (AIO Engine)
-      if (qualities.length === 0 && (urlInput.includes('facebook.com') || urlInput.includes('fb.watch') || urlInput.includes('instagram.com'))) {
+      // 2. Facebook, Instagram & YouTube Universal Gateway (SaveFrom & Cobalt Universal Engine)
+      if (qualities.length === 0) {
         try {
           const apiRes = await fetch(`https://api.vkrdown.workers.dev/server?vkr=${encodeURIComponent(urlInput)}`);
           if (apiRes.ok) {
             const data = await apiRes.json();
             if (data.downloads && data.downloads.length > 0) {
               data.downloads.forEach(d => {
-                qualities.push({ format: d.format || d.quality || 'Social Media Video', url: d.url });
+                if(d.url) qualities.push({ format: d.format || d.quality || 'Download Stream', url: d.url });
               });
-            } else if (data.data) {
-              qualities.push({ format: 'HD Quality Video', url: data.data });
+            } else if (data.data && typeof data.data === 'string') {
+              qualities.push({ format: 'Download HD Video', url: data.data });
             }
           }
         } catch(e) {}
       }
 
-      // 3. Multi Platform API (Fallback for YouTube, Insta, Facebook)
-      if (qualities.length === 0) {
+      // 3. Instagram Dedicated Fallback (SSSGram API Router)
+      if (qualities.length === 0 && urlInput.includes('instagram.com')) {
         try {
-          const fbRes = await fetch(`https://social-downloader-api.vercel.app/api/download?url=${encodeURIComponent(urlInput)}`);
-          if (fbRes.ok) {
-            const fbData = await fbRes.json();
-            if (fbData.url) {
-              qualities.push({ format: 'Download Video (HD)', url: fbData.url });
-            } else if (fbData.links) {
-              fbData.links.forEach(l => {
-                qualities.push({ format: l.quality || 'Download Option', url: l.url });
+          const instaRes = await fetch(`https://api.sssgram.com/api/v1/sub/link?url=${encodeURIComponent(urlInput)}`);
+          if (instaRes.ok) {
+            const data = await instaRes.json();
+            if (data.data && data.data.items) {
+              data.data.items.forEach(item => {
+                if (item.url) qualities.push({ format: 'Instagram Media HD', url: item.url });
               });
             }
           }
         } catch(e) {}
       }
 
-      // 4. Invidious / Loader Fallback Engine
-      if (qualities.length === 0) {
+      // 4. YouTube Dedicated Fallback (Invidious Video Stream Router)
+      if (qualities.length === 0 && (urlInput.includes('youtube.com') || urlInput.includes('youtu.be'))) {
         try {
-          const y2Res = await fetch(`https://api.sssgram.com/api/v1/sub/link?url=${encodeURIComponent(urlInput)}`);
-          if (y2Res.ok) {
-            const y2Data = await y2Res.json();
-            if (y2Data.data && y2Data.data.items) {
-              y2Data.data.items.forEach(item => {
-                if (item.url) qualities.push({ format: item.quality || 'Video Stream', url: item.url });
-              });
+          let videoId = "";
+          if (urlInput.includes('youtu.be/')) {
+            videoId = urlInput.split('youtu.be/')[1].split('?')[0];
+          } else if (urlInput.includes('v=')) {
+            videoId = urlInput.split('v=')[1].split('&')[0];
+          } else if (urlInput.includes('shorts/')) {
+            videoId = urlInput.split('shorts/')[1].split('?')[0];
+          }
+
+          if (videoId) {
+            const ytRes = await fetch(`https://invidious.nerdvpn.de/api/v1/videos/${videoId}`);
+            if (ytRes.ok) {
+              const ytData = await ytRes.json();
+              if (ytData.formatStreams && ytData.formatStreams.length > 0) {
+                ytData.formatStreams.forEach(f => {
+                  if (f.url) qualities.push({ format: `YouTube ${f.qualityLabel || f.container}`, url: f.url });
+                });
+              }
             }
           }
         } catch(e) {}
       }
 
+      // Render Download Buttons
       if (qualities.length > 0) {
-        qualities.forEach(q => {
+        // Remove Duplicate Download URLs
+        const uniqueQualities = Array.from(new Set(qualities.map(a => a.url)))
+          .map(url => qualities.find(a => a.url === url));
+
+        uniqueQualities.forEach(q => {
           const label = q.format || 'Download Video';
           const link = q.url;
           
@@ -268,10 +282,10 @@
           btn.rel = 'noopener noreferrer';
           btn.className = 'bg-slate-800 hover:bg-slate-700 border border-purple-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
           btn.innerHTML = `
-            <span class="flex items-center gap-2.5 text-sm">
+            <span class="flex items-center gap-2.5 text-sm truncate pr-2">
               <i class="fa-solid fa-circle-play text-purple-400"></i> ${label}
             </span>
-            <span class="text-xs bg-purple-600/30 border border-purple-500/40 px-3 py-1.5 rounded-xl text-purple-300 font-bold">
+            <span class="text-xs bg-purple-600/30 border border-purple-500/40 px-3 py-1.5 rounded-xl text-purple-300 font-bold whitespace-nowrap">
               Download <i class="fa-solid fa-download text-xs ml-1"></i>
             </span>
           `;
@@ -280,7 +294,7 @@
 
         resultCard.classList.remove('hidden');
       } else {
-        errorMsg.textContent = "මෙම Link එකෙන් Video එක Extract කිරීමට නොහැකි විය. කරුණාකර Public (Private නොවන) Link එකක් ඇතුළත් කර උත්සාහ කරන්න.";
+        errorMsg.textContent = "මෙම Link එකෙන් Video එක Extract කිරීමට නොහැකි විය. Link එක Public වීඩියෝවක්දැයි පරීක්‍ෂා කර නැවත උත්සාහ කරන්න.";
         errorMsg.classList.remove('hidden');
       }
 
