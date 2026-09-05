@@ -1,12 +1,10 @@
-{
-  "name": "fb-downloader-backend",
+l{
+  "name": "dil-downloader",
   "version": "1.0.0",
-  "main": "server.js",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "build": "echo 'Building site...'"
   },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.18.2"
-  }
+  "dependencies": {}
 }
