@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DiL Downloader - All-in-One Video Downloader</title>
+  <title>DiL Downloader - Multi-Social Media Video Downloader</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -60,7 +60,7 @@
       </div>
       <h1 class="text-4xl md:text-5xl font-extrabold brand-title">DiL Downloader</h1>
     </div>
-    <p class="text-slate-400 text-sm font-medium">Download Videos from Facebook, TikTok, Instagram & YouTube</p>
+    <p class="text-slate-400 text-sm font-medium">Download FB, TikTok, Insta & YouTube Videos Free</p>
   </header>
 
   <!-- Main Content Container -->
@@ -95,7 +95,7 @@
           id="downloadBtn" 
           class="btn-gradient text-white font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95"
         >
-          <span>Fetch Download Link</span>
+          <span>Fetch Video Link</span>
           <i class="fa-solid fa-download"></i>
         </button>
       </div>
@@ -106,16 +106,16 @@
     <!-- Loading Spinner -->
     <div id="loading" class="hidden text-center my-6">
       <div class="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin inline-block"></div>
-      <p class="text-slate-400 text-sm mt-3 animate-pulse">Extracting Direct Links...</p>
+      <p class="text-slate-400 text-sm mt-3 animate-pulse">Analyzing Link & Fetching Download Stream...</p>
     </div>
 
     <!-- Dynamic Quality Selection Result Box -->
     <div id="resultCard" class="hidden glass-card p-6 rounded-3xl text-center border border-purple-500/30 space-y-4">
       <h2 class="text-base font-bold text-slate-100 flex items-center justify-center gap-2">
-        <i class="fa-solid fa-circle-check text-green-400"></i> Select Download Option:
+        <i class="fa-solid fa-circle-check text-green-400"></i> Download Ready:
       </h2>
       
-      <!-- Quality Options Container -->
+      <!-- Quality Options List Container -->
       <div id="qualityOptions" class="flex flex-col gap-3 max-w-md mx-auto pt-2"></div>
     </div>
 
@@ -148,25 +148,6 @@
         <i class="fa-brands fa-instagram hover:text-pink-500 transition hover:scale-110"></i>
         <i class="fa-brands fa-tiktok hover:text-cyan-400 transition hover:scale-110"></i>
         <i class="fa-brands fa-youtube hover:text-red-500 transition hover:scale-110"></i>
-      </div>
-    </div>
-
-    <!-- Feature Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="glass-card p-5 rounded-2xl text-center">
-        <div class="text-cyan-400 text-2xl mb-2"><i class="fa-solid fa-ban"></i></div>
-        <h4 class="font-bold text-sm mb-1">No Watermark</h4>
-        <p class="text-xs text-slate-400">Clean TikTok video downloads without logo.</p>
-      </div>
-      <div class="glass-card p-5 rounded-2xl text-center">
-        <div class="text-purple-400 text-2xl mb-2"><i class="fa-solid fa-bolt"></i></div>
-        <h4 class="font-bold text-sm mb-1">Fast Download</h4>
-        <p class="text-xs text-slate-400">Direct high-speed stream links.</p>
-      </div>
-      <div class="glass-card p-5 rounded-2xl text-center">
-        <div class="text-pink-400 text-2xl mb-2"><i class="fa-solid fa-shield-halved"></i></div>
-        <h4 class="font-bold text-sm mb-1">100% Free</h4>
-        <p class="text-xs text-slate-400">No pop-up ads or registration required.</p>
       </div>
     </div>
 
@@ -212,30 +193,31 @@
 
       let qualities = [];
 
-      // Engine 1: TikTok No-Watermark Dedicated Engine
+      // 1. TikTok Engine (TikWM)
       if (urlInput.includes('tiktok.com')) {
         try {
           const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(urlInput)}`);
           if (res.ok) {
             const data = await res.json();
             if (data.data) {
-              if (data.data.play) qualities.push({ format: 'TikTok (No Watermark)', url: data.data.play });
-              if (data.data.wmplay) qualities.push({ format: 'TikTok (With Watermark)', url: data.data.wmplay });
-              if (data.data.music) qualities.push({ format: 'Audio Only (MP3)', url: data.data.music });
+              if (data.data.play) qualities.push({ format: 'TikTok Video (No Watermark)', url: data.data.play });
+              if (data.data.wmplay) qualities.push({ format: 'TikTok Video (With Watermark)', url: data.data.wmplay });
+              if (data.data.music) qualities.push({ format: 'Audio (MP3)', url: data.data.music });
             }
           }
         } catch(e) {}
       }
 
-      // Engine 2: Multi-Platform Engine (Facebook, Instagram, YouTube)
-      if (qualities.length === 0) {
+      // 2. Facebook / Instagram Dedicated Engine (AIO Engine)
+      if (qualities.length === 0 && (urlInput.includes('facebook.com') || urlInput.includes('fb.watch') || urlInput.includes('instagram.com'))) {
         try {
-          const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(`https://api.vkrdown.workers.dev/server?vkr=${encodeURIComponent(urlInput)}`)}`;
-          const res = await fetch(proxyUrl);
-          if (res.ok) {
-            const data = await res.json();
+          const apiRes = await fetch(`https://api.vkrdown.workers.dev/server?vkr=${encodeURIComponent(urlInput)}`);
+          if (apiRes.ok) {
+            const data = await apiRes.json();
             if (data.downloads && data.downloads.length > 0) {
-              qualities = data.downloads.map(d => ({ format: d.format || d.quality || 'HD Download', url: d.url }));
+              data.downloads.forEach(d => {
+                qualities.push({ format: d.format || d.quality || 'Social Media Video', url: d.url });
+              });
             } else if (data.data) {
               qualities.push({ format: 'HD Quality Video', url: data.data });
             }
@@ -243,23 +225,33 @@
         } catch(e) {}
       }
 
-      // Engine 3: Backup Cobalt / Social Multi Engine
+      // 3. Multi Platform API (Fallback for YouTube, Insta, Facebook)
       if (qualities.length === 0) {
         try {
-          const res = await fetch('https://api.cobalt.tools/api/json', {
-            method: 'POST',
-            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: urlInput })
-          });
-          if (res.ok) {
-            const cobData = await res.json();
-            if (cobData.picker) {
-              qualities = cobData.picker.map((item, idx) => ({
-                format: item.quality || `Option ${idx + 1}`,
-                url: item.url
-              }));
-            } else if (cobData.url) {
-              qualities.push({ format: 'Direct Download Link', url: cobData.url });
+          const fbRes = await fetch(`https://social-downloader-api.vercel.app/api/download?url=${encodeURIComponent(urlInput)}`);
+          if (fbRes.ok) {
+            const fbData = await fbRes.json();
+            if (fbData.url) {
+              qualities.push({ format: 'Download Video (HD)', url: fbData.url });
+            } else if (fbData.links) {
+              fbData.links.forEach(l => {
+                qualities.push({ format: l.quality || 'Download Option', url: l.url });
+              });
+            }
+          }
+        } catch(e) {}
+      }
+
+      // 4. Invidious / Loader Fallback Engine
+      if (qualities.length === 0) {
+        try {
+          const y2Res = await fetch(`https://api.sssgram.com/api/v1/sub/link?url=${encodeURIComponent(urlInput)}`);
+          if (y2Res.ok) {
+            const y2Data = await y2Res.json();
+            if (y2Data.data && y2Data.data.items) {
+              y2Data.data.items.forEach(item => {
+                if (item.url) qualities.push({ format: item.quality || 'Video Stream', url: item.url });
+              });
             }
           }
         } catch(e) {}
@@ -288,11 +280,10 @@
 
         resultCard.classList.remove('hidden');
       } else {
-        errorMsg.textContent = "මෙම Link එකෙන් Video එක ලබා ගැනීමට නොහැකි විය. Public Video Link එකක් භාවිතා කරන්න.";
+        errorMsg.textContent = "මෙම Link එකෙන් Video එක Extract කිරීමට නොහැකි විය. කරුණාකර Public (Private නොවන) Link එකක් ඇතුළත් කර උත්සාහ කරන්න.";
         errorMsg.classList.remove('hidden');
       }
 
-      loading.classList.hidden = true;
       loading.classList.add('hidden');
     }
   </script>
