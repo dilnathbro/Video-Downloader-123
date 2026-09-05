@@ -1,4 +1,5 @@
- <!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -193,7 +194,7 @@
 
       let qualities = [];
 
-      // 1. TikTok Handler (TikWM Engine)
+      // 1. TikTok Dedicated Engine (TikWM)
       if (urlInput.includes('tiktok.com')) {
         try {
           const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(urlInput)}`);
@@ -208,67 +209,51 @@
         } catch(e) {}
       }
 
-      // 2. Facebook, Instagram & YouTube Universal Gateway (SaveFrom & Cobalt Universal Engine)
+      // 2. High-Speed Universal API (Publer Multi-Downloader API)
       if (qualities.length === 0) {
         try {
-          const apiRes = await fetch(`https://api.vkrdown.workers.dev/server?vkr=${encodeURIComponent(urlInput)}`);
-          if (apiRes.ok) {
-            const data = await apiRes.json();
-            if (data.downloads && data.downloads.length > 0) {
-              data.downloads.forEach(d => {
-                if(d.url) qualities.push({ format: d.format || d.quality || 'Download Stream', url: d.url });
-              });
-            } else if (data.data && typeof data.data === 'string') {
-              qualities.push({ format: 'Download HD Video', url: data.data });
-            }
-          }
-        } catch(e) {}
-      }
+          const publerRes = await fetch("https://publer.io/api/v1/tools/media-downloader", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: urlInput })
+          });
 
-      // 3. Instagram Dedicated Fallback (SSSGram API Router)
-      if (qualities.length === 0 && urlInput.includes('instagram.com')) {
-        try {
-          const instaRes = await fetch(`https://api.sssgram.com/api/v1/sub/link?url=${encodeURIComponent(urlInput)}`);
-          if (instaRes.ok) {
-            const data = await instaRes.json();
-            if (data.data && data.data.items) {
-              data.data.items.forEach(item => {
-                if (item.url) qualities.push({ format: 'Instagram Media HD', url: item.url });
+          if (publerRes.ok) {
+            const pubData = await publerRes.json();
+            if (pubData && pubData.media && pubData.media.length > 0) {
+              pubData.media.forEach(item => {
+                if (item.url) {
+                  qualities.push({
+                    format: item.quality ? `Video (${item.quality})` : 'Download Video (HD)',
+                    url: item.url
+                  });
+                }
               });
             }
           }
         } catch(e) {}
       }
 
-      // 4. YouTube Dedicated Fallback (Invidious Video Stream Router)
-      if (qualities.length === 0 && (urlInput.includes('youtube.com') || urlInput.includes('youtu.be'))) {
+      // 3. Backup Universal Engine (Fast-Worker Gateway)
+      if (qualities.length === 0) {
         try {
-          let videoId = "";
-          if (urlInput.includes('youtu.be/')) {
-            videoId = urlInput.split('youtu.be/')[1].split('?')[0];
-          } else if (urlInput.includes('v=')) {
-            videoId = urlInput.split('v=')[1].split('&')[0];
-          } else if (urlInput.includes('shorts/')) {
-            videoId = urlInput.split('shorts/')[1].split('?')[0];
-          }
-
-          if (videoId) {
-            const ytRes = await fetch(`https://invidious.nerdvpn.de/api/v1/videos/${videoId}`);
-            if (ytRes.ok) {
-              const ytData = await ytRes.json();
-              if (ytData.formatStreams && ytData.formatStreams.length > 0) {
-                ytData.formatStreams.forEach(f => {
-                  if (f.url) qualities.push({ format: `YouTube ${f.qualityLabel || f.container}`, url: f.url });
-                });
-              }
+          const backupRes = await fetch(`https://api.vkrdown.workers.dev/server?vkr=${encodeURIComponent(urlInput)}`);
+          if (backupRes.ok) {
+            const bData = await backupRes.json();
+            if (bData.downloads && bData.downloads.length > 0) {
+              bData.downloads.forEach(d => {
+                if (d.url) qualities.push({ format: d.format || d.quality || 'Download Option', url: d.url });
+              });
+            } else if (bData.data && typeof bData.data === 'string') {
+              qualities.push({ format: 'Download HD Video', url: bData.data });
             }
           }
         } catch(e) {}
       }
 
-      // Render Download Buttons
+      // Display Results
       if (qualities.length > 0) {
-        // Remove Duplicate Download URLs
+        // Remove duplicate URLs if any
         const uniqueQualities = Array.from(new Set(qualities.map(a => a.url)))
           .map(url => qualities.find(a => a.url === url));
 
@@ -294,7 +279,7 @@
 
         resultCard.classList.remove('hidden');
       } else {
-        errorMsg.textContent = "මෙම Link එකෙන් Video එක Extract කිරීමට නොහැකි විය. Link එක Public වීඩියෝවක්දැයි පරීක්‍ෂා කර නැවත උත්සාහ කරන්න.";
+        errorMsg.textContent = "මෙම Link එකෙන් Video එක Extract කිරීමට නොහැකි විය. කරුණාකර Public (Private නොවන) Link එකක් ඇතුළත් කර උත්සාහ කරන්න.";
         errorMsg.classList.remove('hidden');
       }
 
