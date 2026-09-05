@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DiL Downloader - Premium Video Downloader</title>
+  <title>DiL Downloader - Multi-Quality Video Downloader</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -60,7 +60,7 @@
       </div>
       <h1 class="text-4xl md:text-5xl font-extrabold brand-title">DiL Downloader</h1>
     </div>
-    <p class="text-slate-400 text-sm font-medium">Fast, Free & Direct Media Downloader</p>
+    <p class="text-slate-400 text-sm font-medium">Select Quality & No-Watermark Downloader</p>
   </header>
 
   <!-- Main Content Container -->
@@ -82,7 +82,7 @@
           <input 
             type="url" 
             id="videoUrl" 
-            placeholder="Paste Facebook, TikTok, Instagram, or YouTube Link..." 
+            placeholder="Paste TikTok, Facebook, Instagram, or YouTube Link..." 
             class="w-full pl-5 pr-12 py-4 bg-slate-900/80 border border-slate-700/80 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition"
           />
           <button onclick="clearInput()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
@@ -95,8 +95,8 @@
           id="downloadBtn" 
           class="btn-gradient text-white font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95"
         >
-          <span>Fetch Video</span>
-          <i class="fa-solid fa-arrow-down-long"></i>
+          <span>Fetch Video & Qualities</span>
+          <i class="fa-solid fa-sliders"></i>
         </button>
       </div>
 
@@ -106,21 +106,19 @@
     <!-- Loading Spinner -->
     <div id="loading" class="hidden text-center my-6">
       <div class="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin inline-block"></div>
-      <p class="text-slate-400 text-sm mt-3 animate-pulse">Extracting Media File...</p>
+      <p class="text-slate-400 text-sm mt-3 animate-pulse">Extracting Direct Links & Watermark Removal...</p>
     </div>
 
-    <!-- Direct Result Box -->
+    <!-- Dynamic Quality Selection Result Box -->
     <div id="resultCard" class="hidden glass-card p-6 rounded-3xl text-center border border-purple-500/30 space-y-4">
-      <h2 class="text-base font-bold text-slate-100"><i class="fa-solid fa-circle-check text-green-400"></i> Video Ready for Download</h2>
-      <a id="downloadLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-gradient text-white font-bold py-4 px-8 rounded-2xl transition inline-flex items-center gap-2 w-full justify-center shadow-lg hover:shadow-purple-500/20">
-        <i class="fa-solid fa-download"></i> Download Video File
-      </a>
-    </div>
-
-    <!-- Embedded Downloader Container (External Redirect නැතිව Site එක ඇතුළෙම පෙන්වීමට) -->
-    <div id="embedCard" class="hidden glass-card p-4 rounded-3xl border border-purple-500/30 overflow-hidden">
-      <p class="text-xs text-slate-400 mb-3 text-center"><i class="fa-solid fa-shield-halved text-purple-400"></i> Direct Download Frame</p>
-      <iframe id="downloadFrame" class="w-full h-[450px] rounded-2xl border-0" src=""></iframe>
+      <h2 class="text-base font-bold text-slate-100 flex items-center justify-center gap-2">
+        <i class="fa-solid fa-circle-check text-green-400"></i> Select Download Option:
+      </h2>
+      
+      <!-- Quality Options List Container -->
+      <div id="qualityOptions" class="flex flex-col gap-3 max-w-md mx-auto pt-2">
+        <!-- Quality Buttons Will Render Here Dynamically -->
+      </div>
     </div>
 
     <!-- MND Mobile Store Banner -->
@@ -158,32 +156,20 @@
     <!-- Feature Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="glass-card p-5 rounded-2xl text-center">
-        <div class="text-purple-400 text-2xl mb-2"><i class="fa-solid fa-bolt"></i></div>
-        <h4 class="font-bold text-sm mb-1">Ultra Fast</h4>
-        <p class="text-xs text-slate-400">High-speed server fetching for quick downloads.</p>
+        <div class="text-cyan-400 text-2xl mb-2"><i class="fa-solid fa-ban"></i></div>
+        <h4 class="font-bold text-sm mb-1">No Watermark</h4>
+        <p class="text-xs text-slate-400">Clean TikTok video downloads without logo.</p>
       </div>
       <div class="glass-card p-5 rounded-2xl text-center">
-        <div class="text-blue-400 text-2xl mb-2"><i class="fa-solid fa-shield-halved"></i></div>
-        <h4 class="font-bold text-sm mb-1">100% Safe</h4>
-        <p class="text-xs text-slate-400">No pop-up ads, viruses or login requirements.</p>
+        <div class="text-purple-400 text-2xl mb-2"><i class="fa-solid fa-sliders"></i></div>
+        <h4 class="font-bold text-sm mb-1">Quality Options</h4>
+        <p class="text-xs text-slate-400">Supports HD, SD, and MP3 audio downloads.</p>
       </div>
       <div class="glass-card p-5 rounded-2xl text-center">
-        <div class="text-pink-400 text-2xl mb-2"><i class="fa-solid fa-gem"></i></div>
-        <h4 class="font-bold text-sm mb-1">HD Quality</h4>
-        <p class="text-xs text-slate-400">Download videos in original HD quality.</p>
+        <div class="text-pink-400 text-2xl mb-2"><i class="fa-solid fa-shield-halved"></i></div>
+        <h4 class="font-bold text-sm mb-1">100% Free</h4>
+        <p class="text-xs text-slate-400">No pop-up ads or registration required.</p>
       </div>
-    </div>
-
-    <!-- How to Download Guide -->
-    <div class="glass-card p-6 rounded-3xl">
-      <h3 class="font-bold text-slate-200 text-base mb-4 flex items-center gap-2">
-        <i class="fa-solid fa-circle-info text-blue-400"></i> How to Download Videos?
-      </h3>
-      <ol class="text-xs text-slate-300 space-y-3 list-decimal list-inside">
-        <li>Copy the link of the video from Facebook, TikTok, Instagram or YouTube.</li>
-        <li>Paste the URL link into the input box above.</li>
-        <li>Click <strong>"Fetch Video"</strong> and then download your video file.</li>
-      </ol>
     </div>
 
   </main>
@@ -212,13 +198,11 @@
       const errorMsg = document.getElementById('errorMessage');
       const loading = document.getElementById('loading');
       const resultCard = document.getElementById('resultCard');
-      const embedCard = document.getElementById('embedCard');
-      const downloadFrame = document.getElementById('downloadFrame');
-      const downloadLink = document.getElementById('downloadLink');
+      const qualityOptions = document.getElementById('qualityOptions');
 
       errorMsg.classList.add('hidden');
       resultCard.classList.add('hidden');
-      embedCard.classList.add('hidden');
+      qualityOptions.innerHTML = '';
 
       if (!urlInput) {
         errorMsg.textContent = "කරුණාකර Video Link එකක් ලබා දෙන්න.";
@@ -229,43 +213,90 @@
       loading.classList.remove('hidden');
 
       try {
-        let downloadUrl = null;
+        let qualities = [];
 
-        // Engine 1: Direct Universal Fetcher
-        try {
-          const res1 = await fetch(`https://api.vkrdown.workers.dev/server?vkr=${encodeURIComponent(urlInput)}`);
-          if (res1.ok) {
-            const data1 = await res1.json();
-            downloadUrl = data1.data || data1.download || data1.url || (data1.downloads && data1.downloads[0]?.url);
-          }
-        } catch (e) {}
-
-        // Engine 2: Cobalt Direct Extraction
-        if (!downloadUrl) {
+        // Dedicated TikTok No-Watermark API Check
+        if (urlInput.includes('tiktok.com')) {
           try {
-            const res2 = await fetch('https://api.cobalt.tools/api/json', {
-              method: 'POST',
-              headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-              body: JSON.stringify({ url: urlInput })
-            });
-            if (res2.ok) {
-              const data2 = await res2.json();
-              downloadUrl = data2.url || (data2.picker && data2.picker[0]?.url);
+            const tikRes = await fetch(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(urlInput)}`);
+            if (tikRes.ok) {
+              const tikData = await tikRes.json();
+              if (tikData.video?.noWatermark) {
+                qualities.push({ format: 'TikTok Video (No Watermark)', url: tikData.video.noWatermark });
+              }
+              if (tikData.video?.watermark) {
+                qualities.push({ format: 'TikTok Video (With Watermark)', url: tikData.video.watermark });
+              }
+              if (tikData.music?.play_url) {
+                qualities.push({ format: 'Audio Only (MP3)', url: tikData.music.play_url });
+              }
             }
-          } catch (e) {}
+          } catch(e) {}
         }
 
-        if (downloadUrl) {
-          downloadLink.href = downloadUrl;
+        // Multi-platform Fallback Engine (Facebook, Insta, YouTube & TikTok)
+        if (qualities.length === 0) {
+          try {
+            const res = await fetch(`https://api.vkrdown.workers.dev/server?vkr=${encodeURIComponent(urlInput)}`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data.downloads && data.downloads.length > 0) {
+                qualities = data.downloads.map(d => ({ format: d.format || d.quality || 'Download Video', url: d.url }));
+              } else if (data.data) {
+                qualities.push({ format: 'HD Quality (No Watermark)', url: data.data });
+              }
+            }
+          } catch(e) {}
+        }
+
+        // Secondary Backup Engine
+        if (qualities.length === 0) {
+          const cobRes = await fetch('https://api.cobalt.tools/api/json', {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: urlInput })
+          });
+          if (cobRes.ok) {
+            const cobData = await cobRes.json();
+            if (cobData.picker) {
+              qualities = cobData.picker.map((item, idx) => ({
+                format: item.quality || `Option ${idx + 1}`,
+                url: item.url
+              }));
+            } else if (cobData.url) {
+              qualities.push({ format: 'Direct Download Link', url: cobData.url });
+            }
+          }
+        }
+
+        if (qualities.length > 0) {
+          qualities.forEach(q => {
+            const label = q.format || 'Download Video';
+            const link = q.url;
+            
+            const btn = document.createElement('a');
+            btn.href = link;
+            btn.target = '_blank';
+            btn.rel = 'noopener noreferrer';
+            btn.className = 'bg-slate-800 hover:bg-slate-700 border border-purple-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
+            btn.innerHTML = `
+              <span class="flex items-center gap-2.5 text-sm">
+                <i class="fa-solid fa-circle-play text-purple-400"></i> ${label}
+              </span>
+              <span class="text-xs bg-purple-600/30 border border-purple-500/40 px-3 py-1.5 rounded-xl text-purple-300 font-bold">
+                Download <i class="fa-solid fa-download text-xs ml-1"></i>
+              </span>
+            `;
+            qualityOptions.appendChild(btn);
+          });
+
           resultCard.classList.remove('hidden');
         } else {
-          // Direct URL Extraction නොහැකි වූ විට, වෙනත් tab වලට යවන්නේ නැතිව Site එක ඇතුළෙම Frame එකෙන් Download පහසුකම පෙන්වයි
-          downloadFrame.src = `https://en.savefrom.net/1-youtube-video-downloader-3v1/?url=${encodeURIComponent(urlInput)}`;
-          embedCard.classList.remove('hidden');
+          throw new Error("මෙම Link එකෙන් Video එක ලබා ගැනීමට නොහැකි විය. කරුණාකර Valid Public Link එකක් ඇතුළත් කරන්න.");
         }
 
       } catch (err) {
-        errorMsg.textContent = "වීඩියෝ එක Fetch කිරීමට නොහැකි විය. වෙනත් Public Video Link එකක් යොදා බලන්න.";
+        errorMsg.textContent = err.message || "වීඩියෝ එක Fetch කිරීමට නොහැකි විය.";
         errorMsg.classList.remove('hidden');
       } finally {
         loading.classList.add('hidden');
