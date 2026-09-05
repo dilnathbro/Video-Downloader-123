@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DiL Downloader - Universal Video Downloader</title>
+  <title>DiL Downloader - Premium Video Downloader</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -30,7 +30,7 @@
       100% { background-position: 0% 50%; }
     }
     .glass-card {
-      background: rgba(30, 41, 59, 0.7);
+      background: rgba(30, 41, 59, 0.75);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -44,23 +44,26 @@
       background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
       transform: translateY(-2px);
     }
+    .store-card {
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(139, 92, 246, 0.15));
+      border: 1px solid rgba(236, 72, 153, 0.3);
+    }
   </style>
 </head>
 <body class="text-white min-h-screen flex flex-col justify-between font-sans relative overflow-x-hidden">
 
-  <!-- Header -->
-  <header class="py-8 text-center border-b border-slate-800/60 relative z-10">
+  <header class="py-6 text-center border-b border-slate-800/60 relative z-10">
     <div class="flex items-center justify-center gap-3 mb-2">
       <div class="p-3 bg-gradient-to-tr from-blue-600 to-pink-500 rounded-2xl shadow-lg">
         <i class="fa-solid fa-bolt text-2xl text-white"></i>
       </div>
       <h1 class="text-4xl md:text-5xl font-extrabold brand-title">DiL Downloader</h1>
     </div>
-    <p class="text-slate-400 text-sm font-medium">Fast & Free Video Downloader</p>
+    <p class="text-slate-400 text-sm font-medium">Fast, Free & Direct Media Downloader</p>
   </header>
 
-  <!-- Main Content -->
-  <main class="max-w-xl mx-auto px-4 py-10 w-full relative z-10">
+  <main class="max-w-3xl mx-auto px-4 py-8 w-full relative z-10 space-y-8">
+    
     <div class="glass-card p-6 md:p-8 rounded-3xl">
       <label for="videoUrl" class="block text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
         <i class="fa-solid fa-link text-purple-400"></i> Paste Video Link Below:
@@ -76,7 +79,7 @@
         <button 
           onclick="fetchVideo()" 
           id="downloadBtn" 
-          class="btn-gradient text-white font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-2"
+          class="btn-gradient text-white font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-2 cursor-pointer"
         >
           <span>Fetch Video</span>
           <i class="fa-solid fa-arrow-down-long"></i>
@@ -86,33 +89,81 @@
       <p id="errorMessage" class="text-red-400 text-xs mt-4 hidden text-center bg-red-950/50 p-3 rounded-xl border border-red-800/50"></p>
     </div>
 
-    <!-- Loading Spinner -->
-    <div id="loading" class="hidden text-center my-10">
+    <div id="loading" class="hidden text-center my-6">
       <div class="w-10 h-10 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin inline-block"></div>
-      <p class="text-slate-400 text-sm mt-2">Processing video link...</p>
+      <p class="text-slate-400 text-sm mt-2">Extracting media file...</p>
     </div>
 
-    <!-- Result Card -->
-    <div id="resultCard" class="hidden mt-8 glass-card p-6 rounded-3xl text-center border border-purple-500/30">
-      <h2 id="videoTitle" class="text-base font-bold mb-4 text-slate-100"></h2>
-      <a id="downloadLink" href="#" target="_blank" class="btn-gradient text-white font-bold py-4 px-8 rounded-2xl transition inline-flex items-center gap-2 w-full justify-center">
+    <div id="resultCard" class="hidden glass-card p-6 rounded-3xl text-center border border-purple-500/30">
+      <h2 id="videoTitle" class="text-base font-bold mb-4 text-slate-100">Video Ready for Download</h2>
+      <a id="downloadLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-gradient text-white font-bold py-4 px-8 rounded-2xl transition inline-flex items-center gap-2 w-full justify-center shadow-lg">
         <i class="fa-solid fa-download"></i> Download Video
       </a>
     </div>
 
-    <!-- Supported Platforms -->
-    <div class="mt-12 text-center">
-      <p class="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-4">Supported Platforms</p>
-      <div class="flex justify-center gap-6 text-2xl text-slate-400">
+    <div class="glass-card store-card p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-4 text-center md:text-left">
+        <div class="p-4 bg-pink-500/20 text-pink-400 rounded-2xl text-3xl">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-lg text-slate-100">Looking for Mobile Accessories & Gadgets?</h3>
+          <p class="text-xs text-slate-400">Visit MND Mobile Store for the best tech deals in Sri Lanka!</p>
+        </div>
+      </div>
+      <a 
+        href="https://mnd-mobile.netlify.app" 
+        target="_blank" 
+        class="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white text-sm font-bold py-3 px-6 rounded-2xl transition shadow-lg flex items-center gap-2 whitespace-nowrap"
+      >
+        <span>Visit MND Mobile</span>
+        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+      </a>
+    </div>
+
+    <div class="glass-card p-6 rounded-3xl text-center">
+      <p class="text-xs text-slate-400 uppercase tracking-widest font-semibold mb-4">Supported Social Media Platforms</p>
+      <div class="flex justify-center gap-8 text-3xl text-slate-400">
         <i class="fa-brands fa-facebook hover:text-blue-500 transition"></i>
         <i class="fa-brands fa-instagram hover:text-pink-500 transition"></i>
         <i class="fa-brands fa-tiktok hover:text-cyan-400 transition"></i>
         <i class="fa-brands fa-youtube hover:text-red-500 transition"></i>
+        <i class="fa-brands fa-x-twitter hover:text-white transition"></i>
       </div>
     </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="glass-card p-5 rounded-2xl text-center">
+        <div class="text-purple-400 text-2xl mb-2"><i class="fa-solid fa-bolt"></i></div>
+        <h4 class="font-bold text-sm mb-1">Ultra Fast</h4>
+        <p class="text-xs text-slate-400">High-speed server fetching for quick downloads.</p>
+      </div>
+      <div class="glass-card p-5 rounded-2xl text-center">
+        <div class="text-blue-400 text-2xl mb-2"><i class="fa-solid fa-shield-halved"></i></div>
+        <h4 class="font-bold text-sm mb-1">100% Safe</h4>
+        <p class="text-xs text-slate-400">No pop-up ads, viruses or login requirements.</p>
+      </div>
+      <div class="glass-card p-5 rounded-2xl text-center">
+        <div class="text-pink-400 text-2xl mb-2"><i class="fa-solid fa-gem"></i></div>
+        <h4 class="font-bold text-sm mb-1">HD Quality</h4>
+        <p class="text-xs text-slate-400">Download videos in original HD/4K quality.</p>
+      </div>
+    </div>
+
+    <div class="glass-card p-6 rounded-3xl">
+      <h3 class="font-bold text-slate-200 text-base mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-circle-info text-blue-400"></i> How to Download Videos?
+      </h3>
+      <ol class="text-xs text-slate-300 space-y-3 list-decimal list-inside">
+        <li>Copy the link of the video from Facebook, TikTok, Instagram or YouTube.</li>
+        <li>Paste the URL link into the input box above.</li>
+        <li>Click <strong>"Fetch Video"</strong> and then hit the <strong>"Download Video"</strong> button.</li>
+      </ol>
+    </div>
+
   </main>
 
-  <footer class="py-6 text-center text-xs text-slate-500 border-t border-slate-800/50">
+  <footer class="py-6 text-center text-xs text-slate-500 border-t border-slate-800/50 mt-10">
     Designed for <span class="text-purple-400 font-semibold">DiL Downloader</span> &copy; 2026
   </footer>
 
@@ -122,7 +173,6 @@
       const errorMsg = document.getElementById('errorMessage');
       const loading = document.getElementById('loading');
       const resultCard = document.getElementById('resultCard');
-      const videoTitle = document.getElementById('videoTitle');
       const downloadLink = document.getElementById('downloadLink');
 
       errorMsg.classList.add('hidden');
@@ -137,27 +187,39 @@
       loading.classList.remove('hidden');
 
       try {
-        const response = await fetch('/api/fetch', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: urlInput })
-        });
+        let downloadUrl = null;
 
-        // JSON Response ද නැද්ද යන්න ආරක්ෂිතව Check කිරීම
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Server timeout හෝ API ගැටලුවක්. කරුණාකර තවත් මොහොතකින් උත්සාහ කරන්න.");
+        // API 1: Universal Worker Engine
+        try {
+          const res1 = await fetch(`https://api.vkrdown.workers.dev/server?vkr=${encodeURIComponent(urlInput)}`);
+          if (res1.ok) {
+            const data1 = await res1.json();
+            downloadUrl = data1.data || data1.download || data1.url || (data1.downloads && data1.downloads[0]?.url);
+          }
+        } catch (e) {}
+
+        // API 2: Cobalt Direct Engine (Fallback)
+        if (!downloadUrl) {
+          try {
+            const res2 = await fetch('https://api.cobalt.tools/api/json', {
+              method: 'POST',
+              headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url: urlInput })
+            });
+            if (res2.ok) {
+              const data2 = await res2.json();
+              if (data2.url) downloadUrl = data2.url;
+              else if (data2.picker && data2.picker.length > 0) downloadUrl = data2.picker[0].url;
+            }
+          } catch (e) {}
         }
 
-        const data = await response.json();
-
-        if (!response.ok || !data.video_url) {
-          throw new Error(data.error || "Video එක සොයා ගැනීමට නොහැකි විය.");
+        if (downloadUrl) {
+          downloadLink.href = downloadUrl;
+          resultCard.classList.remove('hidden');
+        } else {
+          throw new Error("මෙම Link එකෙන් Video එක ලබා ගැනීමට නොහැකි විය. වෙනත් Public Video Link එකකින් උත්සාහ කරන්න.");
         }
-
-        videoTitle.textContent = data.title || "Ready to Download";
-        downloadLink.href = data.video_url;
-        resultCard.classList.remove('hidden');
 
       } catch (err) {
         errorMsg.textContent = err.message;
@@ -169,3 +231,4 @@
   </script>
 </body>
 </html>
+
