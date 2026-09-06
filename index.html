@@ -211,10 +211,14 @@
     }
 
     function proceedToDownload() {
-      closeNoticeModal();
-      const downloadTarget = `https://en.savefrom.net/1-youtube-video-downloader-3/?url=${encodeURIComponent(currentUrl)}`;
-      window.open(downloadTarget, '_blank');
-    }
+  closeNoticeModal();
+  
+  // ShrinkMe Shortlink එක හරහා SaveFrom එකට Redirect කිරීම
+  const shrinklink = "https://shrinkme.click/kOjpCw5";
+  
+  window.open(shrinklink, '_blank');
+}
+
   </script>
   <script src="https://pl31208202.profitableratecpmnetwork.com/c5/e8/bb/c5e8bbcee4b30e7bfd1d48176fa2544a.js"></script>
 
