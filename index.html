@@ -159,16 +159,11 @@
     document.getElementById('videoUrl').value = '';
   }
 
-  async function fetchVideo() {
+  function fetchVideo() {
     const urlInput = document.getElementById('videoUrl').value.trim();
     const errorMsg = document.getElementById('errorMessage');
-    const loading = document.getElementById('loading');
-    const resultCard = document.getElementById('resultCard');
-    const qualityOptions = document.getElementById('qualityOptions');
 
     errorMsg.classList.add('hidden');
-    resultCard.classList.add('hidden');
-    qualityOptions.innerHTML = '';
 
     if (!urlInput) {
       errorMsg.textContent = "කරුණාකර Facebook Reel / Video Link එකක් ඇතුළත් කරන්න.";
@@ -176,41 +171,21 @@
       return;
     }
 
-    loading.classList.remove('hidden');
-
-    try {
-      const res = await fetch(`/api/download?url=${encodeURIComponent(urlInput)}`);
-      const data = await res.json();
-
-      if (res.ok && data.downloads && data.downloads.length > 0) {
-        data.downloads.forEach(item => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'w-full bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95 cursor-pointer';
-          btn.innerHTML = `
-            <span class="flex items-center gap-2.5 text-sm truncate pr-2">
-              <i class="fa-brands fa-facebook text-blue-400"></i> ${item.quality}
-            </span>
-            <span class="text-xs bg-blue-600/30 border border-blue-500/40 px-3 py-1.5 rounded-xl text-blue-300 font-bold whitespace-nowrap flex items-center gap-1">
-              <span>Download MP4</span> <i class="fa-solid fa-download text-xs"></i>
-            </span>
-          `;
-          btn.onclick = () => window.open(item.url, '_blank');
-          qualityOptions.appendChild(btn);
-        });
-        resultCard.classList.remove('hidden');
-      } else {
-        errorMsg.textContent = data.error || "මෙම Reel/Video එක Extract කිරීමට නොහැකි විය. Link එක Public එකක්දැයි පරීක්ෂා කරන්න.";
-        errorMsg.classList.remove('hidden');
-      }
-    } catch (err) {
-      errorMsg.textContent = "Server සම්බන්ධතාවයේ දෝෂයක් ඇත. කරුණාකර නැවත උත්සාහ කරන්න.";
+    // Facebook Link එකක්දැයි Check කිරීම
+    if (!urlInput.includes('facebook.com') && !urlInput.includes('fb.watch')) {
+      errorMsg.textContent = "කරුණාකර නිවැරදි Facebook / Reel Link එකක් ලබාදෙන්න.";
       errorMsg.classList.remove('hidden');
-    } finally {
-      loading.classList.add('hidden');
+      return;
     }
+
+    // SaveFrom.net Redirect URL එක සැකසීම
+    const saveFromUrl = `https://en.savefrom.net/1-youtube-video-downloader-3/?url=${encodeURIComponent(urlInput)}`;
+
+    // New Tab එකකින් SaveFrom Downloader එක Open කිරීම (Auto Processing)
+    window.open(saveFromUrl, '_blank');
   }
 </script>
+
 
  
 </body>
