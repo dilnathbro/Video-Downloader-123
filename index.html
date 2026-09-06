@@ -210,19 +210,15 @@
       document.getElementById('noticeModal').classList.add('hidden');
     }
 
-    function proceedToDownload() {
+     function proceedToDownload() {
   closeNoticeModal();
   
-  // User Paste කරපු Link එක සමඟ SaveFrom Link එක සැකසීම
-  const saveFromDestination = `https://en.savefrom.net/1-youtube-video-downloader-3/?url=${encodeURIComponent(currentUrl)}`;
+  // Direct SaveFrom Redirect with Video URL
+  const saveFromUrl = `https://en.savefrom.net/1-youtube-video-downloader-3/?url=${encodeURIComponent(currentUrl)}`;
   
-  // ShrinkMe API Key එක හරහා Direct Destination එකට යවන Dynamic Shortlink එක
-  const shrinkMeApiKey = "YOUR_SHRINKME_API_KEY"; // මෙතැනට API Token එක Paste කරන්න
-  
-  const finalUrl = `https://shrinkme.io/api?api=${shrinkMeApiKey}&url=${encodeURIComponent(saveFromDestination)}`;
-  
-  window.open(finalUrl, '_blank');
+  window.open(saveFromUrl, '_blank');
 }
+
 
   </script>
   <script src="https://pl31208202.profitableratecpmnetwork.com/c5/e8/bb/c5e8bbcee4b30e7bfd1d48176fa2544a.js"></script>
