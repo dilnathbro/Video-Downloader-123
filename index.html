@@ -146,72 +146,44 @@
   </footer>
 
   <script>
-    async function pasteFromClipboard() {
-      try {
-        const text = await navigator.clipboard.readText();
-        if (text) document.getElementById('videoUrl').value = text;
-      } catch (err) {
-        alert("කරුණාකර Link එක Paste කිරීමට Permission ලබා දෙන්න.");
-      }
+  async function pasteFromClipboard() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) document.getElementById('videoUrl').value = text;
+    } catch (err) {
+      alert("කරුණාකර Link එක Paste කිරීමට Permission ලබා දෙන්න.");
+    }
+  }
+
+  function clearInput() {
+    document.getElementById('videoUrl').value = '';
+  }
+
+  async function fetchVideo() {
+    const urlInput = document.getElementById('videoUrl').value.trim();
+    const errorMsg = document.getElementById('errorMessage');
+    const loading = document.getElementById('loading');
+    const resultCard = document.getElementById('resultCard');
+    const qualityOptions = document.getElementById('qualityOptions');
+
+    errorMsg.classList.add('hidden');
+    resultCard.classList.add('hidden');
+    qualityOptions.innerHTML = '';
+
+    if (!urlInput) {
+      errorMsg.textContent = "කරුණාකර Facebook Reel / Video Link එකක් ඇතුළත් කරන්න.";
+      errorMsg.classList.remove('hidden');
+      return;
     }
 
-    function clearInput() {
-      document.getElementById('videoUrl').value = '';
-    }
+    loading.classList.remove('hidden');
 
-    async function fetchVideo() {
-      const urlInput = document.getElementById('videoUrl').value.trim();
-      const errorMsg = document.getElementById('errorMessage');
-      const loading = document.getElementById('loading');
-      const resultCard = document.getElementById('resultCard');
-      const qualityOptions = document.getElementById('qualityOptions');
+    try {
+      const res = await fetch(`/api/download?url=${encodeURIComponent(urlInput)}`);
+      const data = await res.json();
 
-      errorMsg.classList.add('hidden');
-      resultCard.classList.add('hidden');
-      qualityOptions.innerHTML = '';
-
-      if (!urlInput) {
-        errorMsg.textContent = "කරුණාකර Facebook Reel / Video Link එකක් ඇතුළත් කරන්න.";
-        errorMsg.classList.remove('hidden');
-        return;
-      }
-
-      loading.classList.remove('hidden');
-
-      let downloads = [];
-
-      // API Engine 1 (Free Scraper Engine)
-      try {
-        const response = await fetch(`https://api.v2.iscdl.com/fb?url=${encodeURIComponent(urlInput)}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.url) downloads.push({ quality: 'Download HD Video (MP4)', url: data.url });
-          if (data.sd) downloads.push({ quality: 'Download SD Video (MP4)', url: data.sd });
-        }
-      } catch (e) {}
-
-      // API Engine 2 (RapidAPI Key Extraction Direct)
-      if (downloads.length === 0) {
-        try {
-          const rapidRes = await fetch(`https://facebook-reel-and-video-downloader.p.rapidapi.com/app/main.php?url=${encodeURIComponent(urlInput)}`, {
-            method: 'GET',
-            headers: {
-              'x-rapidapi-key': 'b411d409cdmsh211c752bb04e82dp1efb7bjsn6aa417c9d2cb',
-              'x-rapidapi-host': 'facebook-reel-and-video-downloader.p.rapidapi.com'
-            }
-          });
-          if (rapidRes.ok) {
-            const rData = await rapidRes.json();
-            if (rData.hd) downloads.push({ quality: 'Download HD Video (MP4)', url: rData.hd });
-            if (rData.sd) downloads.push({ quality: 'Download SD Video (MP4)', url: rData.sd });
-          }
-        } catch (e) {}
-      }
-
-      loading.classList.add('hidden');
-
-      if (downloads.length > 0) {
-        downloads.forEach(item => {
+      if (res.ok && data.downloads && data.downloads.length > 0) {
+        data.downloads.forEach(item => {
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'w-full bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95 cursor-pointer';
@@ -223,19 +195,23 @@
               <span>Download MP4</span> <i class="fa-solid fa-download text-xs"></i>
             </span>
           `;
-          btn.onclick = () => downloadFile(item.url);
+          btn.onclick = () => window.open(item.url, '_blank');
           qualityOptions.appendChild(btn);
         });
         resultCard.classList.remove('hidden');
       } else {
-        errorMsg.textContent = "මෙම Reel/Video එක Extract කිරීමට නොහැකි විය. Link එක Public එකක්දැයි පරීක්ෂා කරන්න.";
+        errorMsg.textContent = data.error || "මෙම Reel/Video එක Extract කිරීමට නොහැකි විය. Link එක Public එකක්දැයි පරීක්ෂා කරන්න.";
         errorMsg.classList.remove('hidden');
       }
+    } catch (err) {
+      errorMsg.textContent = "Server සම්බන්ධතාවයේ දෝෂයක් ඇත. කරුණාකර නැවත උත්සාහ කරන්න.";
+      errorMsg.classList.remove('hidden');
+    } finally {
+      loading.classList.add('hidden');
     }
+  }
+</script>
 
-    function downloadFile(videoUrl) {
-      window.open(videoUrl, '_blank');
-    }
-  </script>
+ 
 </body>
 </html>
