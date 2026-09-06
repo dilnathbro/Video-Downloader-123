@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Allow CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -15,24 +14,29 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Universal Facebook Video Extraction API
-    const apiUrl = `https://api.v2.iscdl.com/fb?url=${encodeURIComponent(url)}`;
-    const response = await fetch(apiUrl, {
+    const response = await fetch(`https://facebook-reel-and-video-downloader.p.rapidapi.com/app/main.php?url=${encodeURIComponent(url)}`, {
       method: 'GET',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+        'x-rapidapi-key': 'b411d409cdmsh211c752bb04e82dp1efb7bjsn6aa417c9d2cb',
+        'x-rapidapi-host': 'facebook-reel-and-video-downloader.p.rapidapi.com'
       }
     });
 
-    if (response.ok) {
-      const data = await response.json();
+    const data = await response.json();
+
+    if (data && (data.sd || data.hd || data.links)) {
       let downloads = [];
 
-      if (data.url) {
-        downloads.push({ quality: 'Download HD Video (MP4)', url: data.url });
+      if (data.hd) {
+        downloads.push({ quality: 'Download HD Video (MP4)', url: data.hd });
       }
       if (data.sd) {
         downloads.push({ quality: 'Download SD Video (MP4)', url: data.sd });
+      }
+
+      if (downloads.length === 0 && data.links) {
+        if (data.links.hd) downloads.push({ quality: 'Download HD Video (MP4)', url: data.links.hd });
+        if (data.links.sd) downloads.push({ quality: 'Download SD Video (MP4)', url: data.links.sd });
       }
 
       if (downloads.length > 0) {
@@ -40,23 +44,9 @@ export default async function handler(req, res) {
       }
     }
 
-    // Fallback Method
-    const fallbackRes = await fetch(`https://api.douyin.wtf/api?url=${encodeURIComponent(url)}`);
-    if (fallbackRes.ok) {
-      const fbData = await fallbackRes.json();
-      if (fbData.video_data && fbData.video_data.nwm_url) {
-        return res.status(200).json({
-          success: true,
-          downloads: [{ quality: 'Download Video (MP4)', url: fbData.video_data.nwm_url }]
-        });
-      }
-    }
-
-    return res.status(400).json({ error: 'මෙම වීඩියෝව Extracted කිරීමට නොහැකි විය. Link එක Public එකක්දැයි පරීක්‍ෂා කරන්න.' });
+    return res.status(400).json({ error: 'වීඩියෝව Extract කිරීමට නොහැකි විය. Link එක Public එකක්දැයි බලන්න.' });
 
   } catch (err) {
-    return res.status(200).json({
-      error: 'වීඩියෝ Link එක Fetch කිරීමට නොහැකි විය. වෙනත් Facebook Public Video Link එකක් දමා උත්සාහ කරන්න.'
-    });
+    return res.status(500).json({ error: 'RapidAPI Server සම්බන්ධතාවයේ දෝෂයක් ඇත.' });
   }
 }
