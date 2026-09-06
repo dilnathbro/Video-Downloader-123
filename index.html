@@ -213,10 +213,15 @@
     function proceedToDownload() {
   closeNoticeModal();
   
-  // ShrinkMe Shortlink එක හරහා SaveFrom එකට Redirect කිරීම
-  const shrinklink = "https://shrinkme.click/kOjpCw5";
+  // User Paste කරපු Link එක සමඟ SaveFrom Link එක සැකසීම
+  const saveFromDestination = `https://en.savefrom.net/1-youtube-video-downloader-3/?url=${encodeURIComponent(currentUrl)}`;
   
-  window.open(shrinklink, '_blank');
+  // ShrinkMe API Key එක හරහා Direct Destination එකට යවන Dynamic Shortlink එක
+  const shrinkMeApiKey = "YOUR_SHRINKME_API_KEY"; // මෙතැනට API Token එක Paste කරන්න
+  
+  const finalUrl = `https://shrinkme.io/api?api=${shrinkMeApiKey}&url=${encodeURIComponent(saveFromDestination)}`;
+  
+  window.open(finalUrl, '_blank');
 }
 
   </script>
