@@ -106,7 +106,7 @@
     <!-- Loading Spinner -->
     <div id="loading" class="hidden text-center my-6">
       <div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin inline-block"></div>
-      <p class="text-slate-400 text-sm mt-3 animate-pulse">Processing via RapidAPI Engine...</p>
+      <p class="text-slate-400 text-sm mt-3 animate-pulse">Processing Video Extraction...</p>
     </div>
 
     <!-- Download Result Box -->
@@ -178,34 +178,58 @@
 
       loading.classList.remove('hidden');
 
-      try {
-        const res = await fetch(`/api/download?url=${encodeURIComponent(urlInput)}`);
-        const data = await res.json();
+      const apiKey = 'b411d409cdmsh211c752bb04e82dp1efb7bjsn6aa417c9d2cb';
+      let extractedLinks = [];
 
-        if (res.ok && data.downloads) {
-          data.downloads.forEach(item => {
-            const btn = document.createElement('a');
-            btn.href = item.url;
-            btn.target = '_blank';
-            btn.download = 'facebook-video.mp4';
-            btn.className = 'bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
-            btn.innerHTML = `
-              <span class="flex items-center gap-2.5 text-sm truncate pr-2">
-                <i class="fa-brands fa-facebook text-blue-400"></i> ${item.quality}
-              </span>
-              <span class="text-xs bg-blue-600/30 border border-blue-500/40 px-3 py-1.5 rounded-xl text-blue-300 font-bold whitespace-nowrap">
-                Download <i class="fa-solid fa-download text-xs ml-1"></i>
-              </span>
-            `;
-            qualityOptions.appendChild(btn);
-          });
-          resultCard.classList.remove('hidden');
-        } else {
-          errorMsg.textContent = data.error || "මෙම වීඩියෝව Extract කිරීමට නොහැකි විය.";
-          errorMsg.classList.remove('hidden');
+      // Engine 1: RapidAPI Direct Fetch
+      try {
+        const rapidRes = await fetch(`https://facebook-reel-and-video-downloader.p.rapidapi.com/app/main.php?url=${encodeURIComponent(urlInput)}`, {
+          method: 'GET',
+          headers: {
+            'x-rapidapi-key': apiKey,
+            'x-rapidapi-host': 'facebook-reel-and-video-downloader.p.rapidapi.com'
+          }
+        });
+
+        if (rapidRes.ok) {
+          const data = await rapidRes.json();
+          if (data.hd) extractedLinks.push({ quality: 'Download HD Video (MP4)', url: data.hd });
+          if (data.sd) extractedLinks.push({ quality: 'Download SD Video (MP4)', url: data.sd });
         }
-      } catch (err) {
-        errorMsg.textContent = "Server සම්බන්ධතාවයේ දෝෂයක් ඇත. කරුණාකර නැවත උත්සාහ කරන්න.";
+      } catch (e) {}
+
+      // Engine 2: Fallback Direct API
+      if (extractedLinks.length === 0) {
+        try {
+          const backRes = await fetch(`https://api.v2.iscdl.com/fb?url=${encodeURIComponent(urlInput)}`);
+          if (backRes.ok) {
+            const bData = await backRes.json();
+            if (bData.url) extractedLinks.push({ quality: 'Download HD Video (MP4)', url: bData.url });
+            if (bData.sd) extractedLinks.push({ quality: 'Download SD Video (MP4)', url: bData.sd });
+          }
+        } catch (e) {}
+      }
+
+      if (extractedLinks.length > 0) {
+        extractedLinks.forEach(item => {
+          const btn = document.createElement('a');
+          btn.href = item.url;
+          btn.target = '_blank';
+          btn.rel = 'noopener noreferrer';
+          btn.className = 'bg-slate-800 hover:bg-slate-700 border border-blue-500/30 text-white font-semibold py-3.5 px-5 rounded-2xl flex items-center justify-between transition shadow active:scale-95';
+          btn.innerHTML = `
+            <span class="flex items-center gap-2.5 text-sm truncate pr-2">
+              <i class="fa-brands fa-facebook text-blue-400"></i> ${item.quality}
+            </span>
+            <span class="text-xs bg-blue-600/30 border border-blue-500/40 px-3 py-1.5 rounded-xl text-blue-300 font-bold whitespace-nowrap">
+              Download <i class="fa-solid fa-download text-xs ml-1"></i>
+            </span>
+          `;
+          qualityOptions.appendChild(btn);
+        });
+        resultCard.classList.remove('hidden');
+      } else {
+        errorMsg.textContent = "මෙම වීඩියෝව Extract කිරීමට නොහැකි විය. වීඩියෝව Public එකක්දැයි බලන්න.";
         errorMsg.classList.remove('hidden');
       }
 
