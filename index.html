@@ -91,31 +91,16 @@
         </div>
 
         <button 
-          onclick="fetchVideo()" 
+          onclick="openNoticeModal()" 
           id="downloadBtn" 
           class="btn-gradient text-white font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95"
         >
-          <span>Fetch Facebook Video</span>
+          <span>Download Video</span>
           <i class="fa-solid fa-download"></i>
         </button>
       </div>
 
       <p id="errorMessage" class="text-red-400 text-xs mt-4 hidden text-center bg-red-950/50 p-3 rounded-xl border border-red-800/50"></p>
-    </div>
-
-    <!-- Loading Spinner -->
-    <div id="loading" class="hidden text-center my-6">
-      <div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin inline-block"></div>
-      <p class="text-slate-400 text-sm mt-3 animate-pulse">Processing Reel / Video Extraction...</p>
-    </div>
-
-    <!-- Download Result Box -->
-    <div id="resultCard" class="hidden glass-card p-6 rounded-3xl text-center border border-blue-500/30 space-y-4">
-      <h2 class="text-base font-bold text-slate-100 flex items-center justify-center gap-2">
-        <i class="fa-solid fa-circle-check text-green-400"></i> Download Ready:
-      </h2>
-      
-      <div id="qualityOptions" class="flex flex-col gap-3 max-w-md mx-auto pt-2"></div>
     </div>
 
     <!-- MND Mobile Store Banner -->
@@ -141,52 +126,95 @@
 
   </main>
 
+  <!-- POP-UP NOTICE MODAL -->
+  <div id="noticeModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+    <div class="glass-card max-w-md w-full p-6 md:p-8 rounded-3xl text-center space-y-5 border border-blue-500/40 shadow-2xl relative animate-fadeIn">
+      
+      <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center mx-auto text-3xl border border-blue-500/30">
+        <i class="fa-solid fa-circle-info"></i>
+      </div>
+
+      <h3 class="text-xl font-bold text-white">තවත් එක් පියවරයි! (Notice)</h3>
+      
+      <div class="bg-slate-900/90 p-4 rounded-2xl text-slate-300 text-xs text-left leading-relaxed border border-slate-700/60 space-y-2">
+        <p class="font-semibold text-blue-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-triangle-exclamation"></i> වැදගත් උපදෙස්:
+        </p>
+        <p>1. <b>"Continue to Download Page"</b> ක්ලික් කළ විට ඔබව SaveFrom Downloader එකට යොමු වේ.</p>
+        <p>2. එම Page එක Close නොකර **තත්පර 3ක් රැඳී සිටින්න.**</p>
+        <p>3. එහි එන **"Download MP4"** Button එක ක්ලික් කර Video එක Download කරගන්න.</p>
+      </div>
+
+      <div class="flex flex-col gap-2 pt-2">
+        <button 
+          onclick="proceedToDownload()" 
+          class="btn-gradient text-white font-bold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-lg active:scale-95 cursor-pointer"
+        >
+          <span>Continue to Download Page</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <button 
+          onclick="closeNoticeModal()" 
+          class="text-slate-400 hover:text-white text-xs py-2 transition cursor-pointer"
+        >
+          Cancel / අවලංගු කරන්න
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <footer class="py-6 text-center text-xs text-slate-500 border-t border-slate-800/50 mt-10">
     Designed for <span class="text-blue-400 font-semibold">DiL Downloader</span> &copy; 2026
   </footer>
 
   <script>
-  async function pasteFromClipboard() {
-    try {
-      const text = await navigator.clipboard.readText();
-      if (text) document.getElementById('videoUrl').value = text;
-    } catch (err) {
-      alert("කරුණාකර Link එක Paste කිරීමට Permission ලබා දෙන්න.");
-    }
-  }
+    let currentUrl = '';
 
-  function clearInput() {
-    document.getElementById('videoUrl').value = '';
-  }
-
-  function fetchVideo() {
-    const urlInput = document.getElementById('videoUrl').value.trim();
-    const errorMsg = document.getElementById('errorMessage');
-
-    errorMsg.classList.add('hidden');
-
-    if (!urlInput) {
-      errorMsg.textContent = "කරුණාකර Facebook Reel / Video Link එකක් ඇතුළත් කරන්න.";
-      errorMsg.classList.remove('hidden');
-      return;
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) document.getElementById('videoUrl').value = text;
+      } catch (err) {
+        alert("කරුණාකර Link එක Paste කිරීමට Permission ලබා දෙන්න.");
+      }
     }
 
-    // Facebook Link එකක්දැයි Check කිරීම
-    if (!urlInput.includes('facebook.com') && !urlInput.includes('fb.watch')) {
-      errorMsg.textContent = "කරුණාකර නිවැරදි Facebook / Reel Link එකක් ලබාදෙන්න.";
-      errorMsg.classList.remove('hidden');
-      return;
+    function clearInput() {
+      document.getElementById('videoUrl').value = '';
     }
 
-    // SaveFrom.net Redirect URL එක සැකසීම
-    const saveFromUrl = `https://en.savefrom.net/1-youtube-video-downloader-3/?url=${encodeURIComponent(urlInput)}`;
+    function openNoticeModal() {
+      const urlInput = document.getElementById('videoUrl').value.trim();
+      const errorMsg = document.getElementById('errorMessage');
 
-    // New Tab එකකින් SaveFrom Downloader එක Open කිරීම (Auto Processing)
-    window.open(saveFromUrl, '_blank');
-  }
-</script>
+      errorMsg.classList.add('hidden');
 
+      if (!urlInput) {
+        errorMsg.textContent = "කරුණාකර Facebook Reel / Video Link එකක් ඇතුළත් කරන්න.";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
 
- 
+      if (!urlInput.includes('facebook.com') && !urlInput.includes('fb.watch')) {
+        errorMsg.textContent = "කරුණාකර නිවැරදි Facebook හෝ Reel Link එකක් ඇතුළත් කරන්න.";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
+      currentUrl = urlInput;
+      document.getElementById('noticeModal').classList.remove('hidden');
+    }
+
+    function closeNoticeModal() {
+      document.getElementById('noticeModal').classList.add('hidden');
+    }
+
+    function proceedToDownload() {
+      closeNoticeModal();
+      const downloadTarget = `https://en.savefrom.net/1-youtube-video-downloader-3/?url=${encodeURIComponent(currentUrl)}`;
+      window.open(downloadTarget, '_blank');
+    }
+  </script>
 </body>
 </html>
